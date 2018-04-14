@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
-LFS=/tools
+source setup.sh
+
 VERSION=swift-4.0.2-RELEASE
 CMAKE_BUILD_TYPE=Release
-WD=`pwd`
 SRC_DIR=$WD/src
 INSTALL_PREFIX=$LFS/usr/local
 ARCH=i686
