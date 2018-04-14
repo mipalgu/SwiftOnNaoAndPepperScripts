@@ -3,9 +3,6 @@ set -e
 
 source versions.sh
 
-wget https://cmake.org/files/v$CMAKE_MAJOR_VERSION.$CMAKE_MINOR_VERSION/cmake-$CMAKE_VERSION.tar.gz
-#wget -O ninja-$NINJA_VERSION.tar.gz http://github.com/ninja-build/ninja/archive/v$NINJA_VERSION.tar.gz
-
 wget https://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_VERSION.tar.gz
 wget https://ftp.gnu.org/gnu/gcc/gcc-$GCC_VERSION.tar.gz
 wget https://ftp.gnu.org/gnu/glibc/glibc-$GLIBC_VERSION.tar.gz
