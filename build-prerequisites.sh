@@ -1,22 +1,20 @@
 #!/usr/bin/env bash
 set -e
 
-source versions.sh
 
 # Set up Variables
-WD=`pwd`
-SRC_DIR=$WD
+source setup.sh
+source versions.sh
 
 # Set Up Environment
 set +h
 umask 022
-LFS=/tools
 PATH="$LFS/bin:/bin:/usr/bin"
 LIBRARY_PATH="$LFS/usr/local/lib:$LFS/usr/lib:$LFS/lib"
 CPATH="$LFS/usr/local/include:$LFS/usr/include:$LFS/include"
 GCC="$LFS/bin/gcc"
 GXX="$LFS/bin/g++"
-export PATH LIBRARY_PATH
+export PATH LIBRARY_PATH CPATH
 
 # Zlib
 rm -rf zlib-$ZLIB_VERSION

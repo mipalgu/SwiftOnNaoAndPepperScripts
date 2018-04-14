@@ -2,18 +2,10 @@
 set -e
 
 # Set up Variables
-WD=`pwd`
-SRC_DIR=$WD
-BINUTILS_VERSION=2.24
-GCC_VERSION=4.9.1
-GLIBC_VERSION=2.23
-LINUX_VERSION=3.16.2
+source setup.sh
+source versions.sh
 
 # Set Up Environment
-set +h
-umask 022
-#LFS=/home/nao/swift-sys
-LFS=/tools
 LC_ALL=POSIX
 LFS_TGT=$(uname -m)-lfs-linux-gnu
 PATH=/$LFS/bin:/bin:/usr/bin
