@@ -1,16 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
+source versions.sh
+
 # Set up Variables
 WD=`pwd`
 SRC_DIR=$WD
-NCURSES_VERSION=5.9
-ZLIB_VERSION=1.2.11
-LIBICONV_VERSION=1.15
-LIBXML2_VERSION=2.9.2
-LIBUUID_VERSION=1.0.3
-ICU4C_VERSION=61_1
-XZ_VERSION=5.0.5
 
 # Set Up Environment
 set +h
