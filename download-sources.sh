@@ -4,7 +4,7 @@ set -e
 source versions.sh
 
 wget https://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_VERSION.tar.gz
-wget https://ftp.gnu.org/gnu/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.gz
+wget https://ftp.gnu.org/gnu/gcc/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.gz
 wget https://ftp.gnu.org/gnu/glibc/glibc-$GLIBC_VERSION.tar.gz
 wget https://www.kernel.org/pub/linux/kernel/v$LINUX_MAJOR_VERSION.x/linux-$LINUX_VERSION.tar.xz
 
