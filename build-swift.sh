@@ -20,6 +20,10 @@ GCC=$LFS/bin/gcc
 GXX=$LFS/bin/g++
 CLANG=$LLVM_BUILD_DIR/bin/clang
 CLANGXX=$LLVM_BUILD_DIR/bin/clang++
+PATH="$LFS/usr/local/bin:$LFS/usr/bin:$PATH"
+LIBRARY_PATH="$LFS/usr/local/lib:$LFS/usr/lib:$LFS/lib"
+CPATH="$LFS/usr/local/include:$LFS/usr/include:$LFS/include"
+export PATH LIBRARY_PATH CPATH
 
 rm -rf $SRC_DIR
 mkdir -p $SRC_DIR

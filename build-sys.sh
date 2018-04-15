@@ -8,7 +8,7 @@ source versions.sh
 # Set Up Environment
 LC_ALL=POSIX
 LFS_TGT=$(uname -m)-lfs-linux-gnu
-PATH=/$LFS/bin:/bin:/usr/bin
+PATH=$LFS/bin:/bin:/usr/bin
 export LFS LC_ALL LFS_TGT PATH
 
 # Set Up Folders
