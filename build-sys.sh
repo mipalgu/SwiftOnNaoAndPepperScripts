@@ -92,7 +92,7 @@ cd $SRC_DIR
 
 # Glibc
 rm -rf glibc-$GLIBC_VERSION
-tar -xvf glibc-$GLIBC_VERSION.tar.xz
+tar -xvf glibc-$GLIBC_VERSION.tar.gz
 rm -rf $SRC_DIR/build-glibc
 mkdir $SRC_DIR/build-glibc
 cd $SRC_DIR/build-glibc
@@ -190,3 +190,4 @@ RANLIB=$LFS_TGT-ranlib \
  make
  make install
  ln -sv gcc $LFS/bin/cc
+ cd $SRC_DIR
