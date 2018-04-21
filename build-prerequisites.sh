@@ -179,6 +179,7 @@ mkdir $LFS/build-ninja
 rm -rf cmake-$CMAKE_VERSION
 tar -xzvf cmake-$CMAKE_VERSION.tar.gz
 rm -rf $LFS/cmake-$CMAKE_VERSION
+mv cmake-$CMAKE_VERSION $LFS/cmake-$CMAKE_VERSION
 rm -rf $LFS/build-cmake
 mkdir $LFS/build-cmake
 
