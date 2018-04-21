@@ -20,15 +20,15 @@ GCC=$LFS/bin/gcc
 GXX=$LFS/bin/g++
 CLANG=$LLVM_BUILD_DIR/bin/clang
 CLANGXX=$LLVM_BUILD_DIR/bin/clang++
-PATH="$LFS/usr/local/bin:$LFS/usr/bin:$PATH"
+PATH="$LFS/usr/local/bin:$LFS/usr/bin:/usr/local/bin:/usr/bin:/bin"
 LIBRARY_PATH="$LFS/usr/local/lib:$LFS/usr/lib:$LFS/lib"
 CPATH="$LFS/usr/local/include:$LFS/usr/include:$LFS/include"
 export PATH LIBRARY_PATH CPATH
 
-rm -rf $SRC_DIR
-mkdir -p $SRC_DIR
+#rm -rf $SRC_DIR
+#mkdir -p $SRC_DIR
 cd $SRC_DIR
-tar -xzvf $WD/apple.tar.gz
+#tar -xzvf $WD/apple.tar.gz
 cd llvm/tools
 rm clang
 rm compiler-rt
@@ -65,8 +65,9 @@ cmake -G "Ninja" \
   -DLLVM_BUILD_EXTERNAL_COMPILER_RT=TRUE \
   -DLLVM_LIT_ARGS=-sv \
   $SRC_DIR/llvm
+LD_LIBRARY_PATH="$LFS/usr/local/lib" ninja -j4
 cd $SRC_DIR
-cmake --build $LLVM_BUILD_DIR
+#cmake --build $LLVM_BUILD_DIR
 
 echo "Patching swift files so that they work with 32 bit."
 sed -i 's/#if defined(__linux__) \&\& defined (__arm__)/#if defined(__linux__) \&\& (defined (__arm__) \|\| defined(__i386__))/' $SRC_DIR/swift/stdlib/public/SwiftShims/LibcShims.h
@@ -99,8 +100,9 @@ cmake -G "Ninja" \
   -DSWIFT_HOST_VARIANT_ARCH="$ARCH" \
   -DSWIFT_HOST_TRIPLE="$TRIPLE" \
   $SRC_DIR/swift
+LD_LIBRARY_PATH="$LFS/usr/local/lib" ninja -j4
 cd $SRC_DIR
-cmake --build $SWIFT_BUILD_DIR
+#cmake --build $SWIFT_BUILD_DIR
 
 cd $WD
 echo "Installing..."
@@ -128,7 +130,8 @@ cmake -G "Ninja" \
   -DCLANG_DEFAULT_RTLIB="compiler-rt" \
   -DLLVM_LIT_ARGS=-sv \
   $SRC_DIR/llvm
+LD_LIBRARY_PATH="$LFS/usr/local/lib" ninja -j4
 cd $SRC_DIR
-cmake --build $LLVM_BUILD_DIR
+#cmake --build $LLVM_BUILD_DIR
 cd $LLVM_BUILD_DIR && ninja install
 cd $WD

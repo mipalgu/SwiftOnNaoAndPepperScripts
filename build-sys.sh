@@ -8,7 +8,7 @@ source versions.sh
 # Set Up Environment
 LC_ALL=POSIX
 LFS_TGT=$(uname -m)-lfs-linux-gnu
-PATH=$LFS/bin:/bin:/usr/bin
+PATH=/$LFS/bin:/bin:/usr/bin
 export LFS LC_ALL LFS_TGT PATH
 
 # Set Up Folders
@@ -149,7 +149,7 @@ make -C ld LIB_PATH=/usr/lib:/lib
 cp -v ld/ld-new $LFS/bin
 cd $SRC_DIR
 
- # GCC - Second Pass
+# GCC - Second Pass
 rm -rf gcc-$GCC_VERSION
 tar -xvf gcc-$GCC_VERSION.tar.gz
 cd $SRC_DIR/gcc-$GCC_VERSION
