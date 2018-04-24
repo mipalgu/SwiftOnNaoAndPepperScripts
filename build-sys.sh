@@ -178,7 +178,7 @@ CC=$LFS_TGT-gcc \
 CXX=$LFS_TGT-g++ \
 AR=$LFS_TGT-ar \
 RANLIB=$LFS_TGT-ranlib \
-../gcc-4.9.1/configure \
+../gcc-$GCC_VERSION/configure \
  --prefix=$LFS \
  --with-local-prefix=$LFS \
  --with-native-system-header-dir=$LFS/include \

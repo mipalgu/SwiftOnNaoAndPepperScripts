@@ -190,6 +190,7 @@ cp build-chroot.sh $LFS
 cp build-swift.sh $LFS
 
 ln -s $LFS/usr/bin/bash $LFS/bin/sh
+mkdir $LFS/dev
 mknod -m 600 $LFS/dev/console c 5 1
 mknod -m 666 $LFS/dev/null c 1 3
 mkdir $LFS/tmp
