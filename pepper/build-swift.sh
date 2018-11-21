@@ -6,9 +6,6 @@ source setup-sysroot.sh
 
 VERSION=swift-4.0.2-RELEASE
 CMAKE_BUILD_TYPE=Release
-SRC_DIR=$WD/src
-INSTALL_PREFIX=$LFS/home/nao/swift-tc
-BUILD_DIR=$SRC_DIR/build
 CMARK_HOST_BUILD_DIR=$BUILD_DIR/cmark-host
 CMARK_BUILD_DIR=$BUILD_DIR/cmark-$PLATFORM
 LLVM_HOST_BUILD_DIR=$BUILD_DIR/llvm-host

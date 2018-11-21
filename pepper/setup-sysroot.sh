@@ -7,6 +7,7 @@ rm -rf $LFS
 mkdir -p $LFS
 
 cp -R $CROSS_TOOLCHAIN_DIR/i686-aldebaran-linux-gnu/sysroot/* $LFS/
+cp -R $CROSS_TOOLCHAIN_DIR/i686-aldebaran-linux-gnu/bin $LFS/
 cp -R $CROSS_TOOLCHAIN_DIR/i686-aldebaran-linux-gnu/include $LFS/
 cp -R $CROSS_TOOLCHAIN_DIR/lib $LFS/
 
