@@ -10,10 +10,6 @@ cp -R $CROSS_TOOLCHAIN_DIR/i686-aldebaran-linux-gnu/sysroot/* $LFS/
 cp -R $CROSS_TOOLCHAIN_DIR/i686-aldebaran-linux-gnu/include $LFS/
 cp -R $CROSS_TOOLCHAIN_DIR/lib $LFS/
 
-cd $LFS/usr/include
-ln -s ../../lib/gcc/i686-aldebaran-linux-gnu/4.9.2/include/stddef.h .
-cd $WD
-
 # Copy icu
 cp -R $CROSS_TOOLCHAIN_DIR/icu/include $LFS/usr/
 cp -R $CROSS_TOOLCHAIN_DIR/icu/lib $LFS/usr/
