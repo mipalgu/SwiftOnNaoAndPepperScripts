@@ -23,7 +23,7 @@ export CPATH="$SYSROOT_CPATH"
 export LANG=/usr/lib/locale/en_US
 
 # For each path in the toolchain, we create the -L -I and -B flags.
-export BINARY_FLAGS=`echo "$SYSROOT_PATH:$SYSROOT_LIBRARY_PATH:$SYSROOT_CPATH" | sed 's/^\|:/ -B/g'`
-export INCLUDE_FLAGS=`echo $SYSROOT_CPATH | sed 's/^\|:/ -I/g'`
-L_FLAGS=`echo $SYSROOT_LIBRARY_PATH | sed 's/^\|:/ -L/g'`
-export LINK_FLAGS="-rpath $INSTALL_PREFIX/usr/local/lib -rpath $INSTALL_PREFIX/usr/lib -rpath $INSTALL_PREFIX/lib $L_FLAGS"
+export BINARY_FLAGS=`echo "$SYSROOT_PATH:$SYSROOT_LIBRARY_PATH:$SYSROOT_CPATH" | sed 's/^/ -B/g' | sed 's/:/ -B/g'`
+export INCLUDE_FLAGS=`echo $SYSROOT_CPATH | sed 's/^/ -I/g' | sed 's/:/ -I/g'`
+L_FLAGS=`echo $SYSROOT_LIBRARY_PATH | sed 's/^/ -L/g' | sed 's/:/ -L/g'`
+export LINK_FLAGS="-R$INSTALL_PREFIX/usr/local/lib -R$INSTALL_PREFIX/usr/lib -R$INSTALL_PREFIX/lib $L_FLAGS"
