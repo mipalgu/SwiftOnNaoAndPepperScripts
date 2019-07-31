@@ -1,3 +1,10 @@
 ctc-*
 apple
 sysroot
+*.tar.gz
+binutils-*
+icu-*
+libuuid-*
+libxml2-*
+xz-*
+zlib-*
