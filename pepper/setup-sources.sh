@@ -27,3 +27,13 @@ then
     ./swift/utils/update-checkout --clone --tag $SWIFT_VERSION
     cd ..
 fi
+
+if [ ! -d "apple/icu" ]
+then
+    cd apple
+    git clone https://github.com/unicode-org/icu
+    tag=`grep "\"icu\": \"" swift/utils/update_checkout/update-checkout-config.json | uniq | sed 's/.*"icu": "\(.*\)\([0-9]*\)-\([0-9]*\).*/\1\2-\3/'`
+    cd icu
+    git checkout "$tag"
+    cd ../..
+fi
