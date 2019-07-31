@@ -20,9 +20,9 @@ mkdir -p $LFS/include
 # Copy default sysroot into $LFS
 cp -R $TOOLCHAIN/sysroot/* $LFS/
 ln -s $LFS/usr/include $LFS/usr/include/i386-linux-gnu
-cp -R $CROSS_TOOLCHAIN_DIR/lib/gcc $LFS/lib/
+cp -R $GCC_DIR $LFS/lib/
 # Symlink crt.o files
-ln -sf $CROSS_TOOLCHAIN_DIR/lib/gcc/i686-aldebaran-linux-gnu/4.9.2/*.o $LFS/lib/
+ln -sf $GCC_TOOLCHAIN/*.o $LFS/lib/
 
 # Setup the sysroot
 #cp -R $TOOLCHAIN/include $LFS/
