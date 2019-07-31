@@ -41,3 +41,22 @@ then
     mv download libuuid-$LIBUUID_VERSION.tar.gz
     tar -xzf libuuid-$LIBUUID_VERSION.tar.gz
 fi
+
+mkdir -p apple
+
+if [ ! -d "apple/swift" ]
+then
+    cd apple
+    git clone https://github.com/apple/swift.git
+    cd swift
+    git checkout $SWIFT_VERSION
+    cd ..
+    cd ..
+fi
+
+if [ ! -d "apple/llvm" ]
+then
+    cd apple
+    ./swift/utils/update-checkout --clone --tag $SWIFT_VERSION
+    cd ..
+fi
