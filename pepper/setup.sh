@@ -2,15 +2,18 @@
 set +h
 umask 022
 
+source versions.sh
+
 WD=`pwd`
 ARCH=i686
 VENDOR=aldebaran
 OS=linux
 TRIPLE=$ARCH-$VENDOR-$OS-gnu
 CROSS_TOOLCHAIN_DIR="$WD/ctc-mac64-atom-2.5.5.5"
-GCC_DIR="$CROSS_TOOLCHAIN_DIR/cross/lib/gcc"
-GCC_TOOLCHAIN="$GCC_DIR/${TRIPLE}/4.9.2"
-TOOLCHAIN="$CROSS_TOOLCHAIN_DIR/cross/${TRIPLE}"
+CROSS_DIR="$CROSS_TOOLCHAIN_DIR/cross"
+GCC_DIR="$CROSS_DIR/lib/gcc"
+GCC_TOOLCHAIN="$GCC_DIR/${TRIPLE}/$GCC_VERSION"
+TOOLCHAIN="$CROSS_DIR/${TRIPLE}"
 # List of cmake prefixes - directories which contains projects which cmake may look for.
 PREFIXES="$CROSS_TOOLCHAIN_DIR/pthread:$CROSS_TOOLCHAIN_DIR/zlib:$CROSS_TOOLCHAIN_DIR/xz_utils:$CROSS_TOOLCHAIN_DIR/xml2:$CROSS_TOOLCHAIN_DIR/icu"
 PLATFORM=$ARCH-$OS
