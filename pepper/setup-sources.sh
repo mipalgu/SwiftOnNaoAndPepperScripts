@@ -3,9 +3,9 @@ set -e
 
 source setup.sh
 
-if [ ! -f "binutils-$BINUTILS_VERSION.tar.gz" ]
+if [ ! -d "binutils-$BINUTILS_VERSION" ]
 then
-    wget https://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_VERSION.tar.gz
+    [ ! -f "binutils-$BINUTILS_VERSION.tar.gz" ] && wget https://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_VERSION.tar.gz
     tar -xzf binutils-$BINUTILS_VERSION.tar.gz
 fi
 
