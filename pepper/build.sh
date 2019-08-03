@@ -3,7 +3,7 @@ set -e
 
 usage() { echo "Usage: $0 [-j<value>]"; }
 
-while getopts ":jh" o; do
+while getopts "j:h" o; do
     case "${o}" in
         h)
             usage
