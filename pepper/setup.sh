@@ -4,6 +4,7 @@ umask 022
 
 source versions.sh
 
+PARALLEL=${PARALLEL-1}
 WD=`pwd`
 ARCH=i686
 VENDOR=aldebaran
