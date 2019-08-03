@@ -9,7 +9,7 @@ then
     tar -xzf binutils-$BINUTILS_VERSION.tar.gz
 fi
 
-if [ ! -d "icu4c-$ICU4C_VERSION" ]
+if [ ! -d "icu-$ICU4C_VERSION" ]
 then
     [ ! -f "icu4c-$ICU4C_VERSION.tar.gz" ] && wget http://download.icu-project.org/files/icu4c/$ICU4C_MAJOR_VERSION.$ICU4C_MINOR_VERSION/icu4c-$ICU4C_VERSION-src.tgz
     mv icu4c-$ICU4C_VERSION-src.tgz icu4c-$ICU4C_VERSION.tar.gz
