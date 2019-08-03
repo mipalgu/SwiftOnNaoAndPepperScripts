@@ -4,7 +4,6 @@ set -e
 source setup.sh
 #source setup-sysroot.sh
 
-VERSION=swift-4.0.2-RELEASE
 CMAKE_BUILD_TYPE=Release
 CMARK_HOST_BUILD_DIR=$BUILD_DIR/cmark-host
 CMARK_BUILD_DIR=$BUILD_DIR/cmark-$PLATFORM
@@ -21,8 +20,8 @@ BUILD_CLANG=$LLVM_BUILD_DIR/bin/clang
 BUILD_CLANGXX=$LLVM_BUILD_DIR/bin/clang++
 HOST_CLANG=$LLVM_HOST_BUILD_DIR/bin/clang
 HOST_CLANGXX=$LLVM_HOST_BUILD_DIR/bin/clang++
-#HOST_CLANG=/usr/local/var/swiftenv/shims/clang
-#HOST_CLANGXX=/usr/local/var/swiftenv/shims/clang++
+LLVM_TABLEGEN=$LLVM_HOST_BUILD_DIR/bin/llvm-tblgen
+CLANG_TABLEGEN=$LLVM_HOST_BUILD_DIR/bin/clang-tblgen
 HOST_SWIFT=/usr/local/var/swiftenv/shims/swift
 
 cd $SRC_DIR
@@ -31,6 +30,7 @@ rm -f clang
 rm -f compiler-rt
 ln -s $SRC_DIR/clang .
 ln -s $SRC_DIR/compiler-rt .
+
 
 if [ ! -f $CMARK_HOST_BUILD_DIR/.cmark-build-host ]
 then
@@ -58,7 +58,7 @@ then
       -DLLVM_LIT_ARGS=-sv \
       $SRC_DIR/llvm
     cd $SRC_DIR
-    cmake --build $LLVM_HOST_BUILD_DIR
+    cmake --build $LLVM_HOST_BUILD_DIR -- -j${PARALLEL}
     touch $LLVM_HOST_BUILD_DIR/.llvm-build-host
 fi
 
@@ -96,8 +96,8 @@ then
     CC="$HOST_CLANG" CXX="$HOST_CLANGXX" cmake -G "Ninja" \
       -DCMAKE_CROSSCOMPILING=TRUE \
       -DCMAKE_SYSROOT="$LFS" \
-      -DLLVM_TABLEGEN=$LLVM_HOST_BUILD_DIR/bin/llvm-tblgen \
-      -DCLANG_TABLEGEN=$LLVM_HOST_BUILD_DIR/bin/clang-tblgen \
+      -DLLVM_TABLEGEN=$LLVM_TBLGEN \
+      -DCLANG_TABLEGEN=$CLANG_TBLGEN \
       -DLLVM_DEFAULT_TARGET_TRIPLE="${TRIPLE}" \
       -DLLVM_TARGET_ARCH="${ARCH}" \
       -DLLVM_TARGETS_TO_BUILD="X86" \
@@ -107,8 +107,8 @@ then
       -DCMAKE_CXX_COMPILER="$HOST_CLANGXX" \
       -DCMAKE_ASM_COMPILER="$HOST_CLANG" \
       -DPYTHON_EXECUTABLE="${PYTHON}" \
-      -DCMAKE_C_FLAGS="-fno-stack-protector -target ${TRIPLE}" \
-      -DCMAKE_CXX_FLAGS="-fpermissive -target ${TRIPLE}" \
+      -DCMAKE_C_FLAGS="-gcc-toolchain $CROSS_DIR/bin -fno-stack-protector -target ${TRIPLE}" \
+      -DCMAKE_CXX_FLAGS="-gcc-toolchain $CROSS_DIR/bin -fpermissive -target ${TRIPLE}" \
       -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
       -DLLVM_USE_LINKER=gold \
       -DLLVM_INCLUDE_DOCS=TRUE \
@@ -159,14 +159,14 @@ then
       -DSWIFT_PRIMARY_VARIANT_SDK="LINUX" \
       -DSWIFT_PRIMARY_VARIANT_ARCH="$ARCH" \
       -DSWIFT_PRIMARY_VARIANT_TRIPLE="$TRIPLE" \
-      -DCMAKE_C_FLAGS="-gcc-toolchain $CROSS_TOOLCHAIN_DIR -Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS" \
-      -DCMAKE_CXX_FLAGS="-gcc-toolchain $CROSS_TOOLCHAIN_DIR -Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS" \
-      -DCMAKE_EXE_LINKER_FLAGS="$LINK_FLAGS -gcc-toolchain $CROSS_TOOLCHAIN_DIR -fno-use-cxa-atexit -luuid -lpthread -fvisibility=protected -Bsymbolic" \
-      -DCMAKE_SHARED_LINKER_FLAGS="$LINK_FLAGS -gcc-toolchain $CROSS_TOOLCHAIN_DIR -fno-use-cxa-atexit -luuid -lpthread -fvisibility=protected -Bsymbolic" \
+      -DCMAKE_C_FLAGS="-gcc-toolchain $CROSS_DIR/bin -Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS" \
+      -DCMAKE_CXX_FLAGS="-gcc-toolchain $CROSS_DIR/bin -Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS" \
+      -DCMAKE_EXE_LINKER_FLAGS="$LINK_FLAGS -gcc-toolchain $CROSS_DIR/bin -fno-use-cxa-atexit -luuid -lpthread -fvisibility=protected -Bsymbolic" \
+      -DCMAKE_SHARED_LINKER_FLAGS="$LINK_FLAGS -gcc-toolchain $CROSS_DIR/bin -fno-use-cxa-atexit -luuid -lpthread -fvisibility=protected -Bsymbolic" \
       -DSWIFT_ENABLE_GOLD_LINKER=TRUE \
       -DSWIFT_ENABLE_LLD_LINKER=FALSE \
       -DSWIFT_NATIVE_SWIFT_TOOLS_PATH="/usr/local/var/swiftenv/shims" \
-      -DLLVM_TABLEGEN_EXE=$LLVM_HOST_BUILD_DIR/bin/llvm-tblgen \
+      -DLLVM_TABLEGEN_EXE=$LLVM_TBLGEN \
       -DSWIFT_STDLIB_BUILD_TYPE="MinSizeRel" \
       -DSWIFT_SDK_LINUX_ARCH_${ARCH}_PATH="$LFS" \
       $SRC_DIR/swift
@@ -180,8 +180,8 @@ then
     touch $SWIFT_BUILD_DIR/lib/swift/linux/i686/StdlibCollectionUnittest.swiftdoc
     touch $SWIFT_BUILD_DIR/lib/swift/linux/i686/StdlibCollectionUnittest.swiftinterface
     touch $SWIFT_BUILD_DIR/lib/swift/linux/libswiftStdlibCollectionUnittest.so
-    touch $SWIFT_BUILD_DIR/.swift-build-cross
     cd $SWIFT_BUILD_DIR && ninja install
+    touch $SWIFT_BUILD_DIR/.swift-build-cross
 fi
 
 cd $WD
@@ -242,7 +242,7 @@ cd $WD
 #  -DCMAKE_EXE_LINKER_FLAGS="$LINK_FLAGS -latomic" \
 #  -DCMAKE_SHARED_LINKER_FLAGS="$LINK_FLAGS -latomic" \
 #  -DSWIFT_NATIVE_SWIFT_TOOLS_PATH="/usr/local/var/swiftenv/shims" \
-#  -DLLVM_TABLEGEN_EXE=$LLVM_HOST_BUILD_DIR/bin/llvm-tblgen \
+#  -DLLVM_TABLEGEN_EXE=$LLVM_TBLGEN \
 #  -DSWIFT_STDLIB_BUILD_TYPE="MinSizeRel" \
 #  -DSWIFT_SDK_LINUX_ARCH_${ARCH}_PATH="$LFS" \
 #  $SRC_DIR/llbuild
@@ -290,7 +290,7 @@ cd $WD
 #  -DCMAKE_EXE_LINKER_FLAGS="$LINK_FLAGS -latomic" \
 #  -DCMAKE_SHARED_LINKER_FLAGS="$LINK_FLAGS -latomic" \
 #  -DSWIFT_NATIVE_SWIFT_TOOLS_PATH="/usr/local/var/swiftenv/shims" \
-#  -DLLVM_TABLEGEN_EXE=$LLVM_HOST_BUILD_DIR/bin/llvm-tblgen \
+#  -DLLVM_TABLEGEN_EXE=$LLVM_TBLGEN \
 #  -DSWIFT_STDLIB_BUILD_TYPE="MinSizeRel" \
 #  -DSWIFT_SDK_LINUX_ARCH_${ARCH}_PATH="$LFS" \
 #  $SRC_DIR/swift-corelibs-libdispatch
@@ -347,7 +347,7 @@ cd $WD
 #  -DCMAKE_EXE_LINKER_FLAGS="$LINK_FLAGS -latomic" \
 #  -DCMAKE_SHARED_LINKER_FLAGS="$LINK_FLAGS -latomic" \
 #  -DSWIFT_NATIVE_SWIFT_TOOLS_PATH="/usr/local/var/swiftenv/shims" \
-#  -DLLVM_TABLEGEN_EXE=$LLVM_HOST_BUILD_DIR/bin/llvm-tblgen \
+#  -DLLVM_TABLEGEN_EXE=$LLVM_TBLGEN \
 #  -DSWIFT_STDLIB_BUILD_TYPE="MinSizeRel" \
 #  -DSWIFT_SDK_LINUX_ARCH_${ARCH}_PATH="$LFS" \
 #  $SRC_DIR/swift-corelibs-foundation
