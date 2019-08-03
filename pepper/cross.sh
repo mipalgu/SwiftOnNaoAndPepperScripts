@@ -12,12 +12,12 @@ SYSROOT_PATH=`echo "$PREFIX_PATHS:${SYSROOT_PATH}:$INSTALL_PREFIX/bin:" | sed 's
 #SYSROOT_LIBRARY_PATH=`echo "$PREFIX_LIBRARY_PATHS:$INSTALL_PREFIX/usr/local/lib:$INSTALL_PREFIX/usr/lib:$INSTALL_PREFIX/lib:$GCC_TOOLCHAIN:$TOOLCHAIN/lib" | sed 's/::/:/g'`
 SYSROOT_LIBRARY_PATH=`echo "$PREFIX_LIBRARY_PATHS:$INSTALL_PREFIX/usr/local/lib:$INSTALL_PREFIX/usr/lib:$INSTALL_PREFIX/lib:$GCC_TOOLCHAIN" | sed 's/::/:/g'`
 SYSROOT_LD_LIBRARY_PATH="$SYSROOT_LIBRARY_PATH"
-SYSROOT_CPATH=`echo "$PREFIX_INCLUDE_PATHS:$SYSROOT_CPATH:$TOOLCHAIN/include/c++/4.9.2/${TRIPLE}:$TOOLCHAIN/include/c++/4.9.2:$INSTALL_PREFIX/usr/local/include:$INSTALL_PREFIX/usr/include:$INSTALL_PREFIX/include:$LFS/usr/include:$LFS/include" | sed 's/::/:/g'`
+SYSROOT_CPATH=`echo "$PREFIX_INCLUDE_PATHS:$SYSROOT_CPATH:$TOOLCHAIN/include/c++/$GCC_VERSION/${TRIPLE}:$TOOLCHAIN/include/c++/$GCC_VERSION:$INSTALL_PREFIX/usr/local/include:$INSTALL_PREFIX/usr/include:$INSTALL_PREFIX/include:$LFS/usr/include:$LFS/include" | sed 's/::/:/g'`
 
 # Paths that cmake should use. 
 export PREFIX_PATH="$PREFIXES"
 export PATH="$SYSROOT_PATH:/usr/local/bin:/usr/bin:/bin"
-export LIBRARY_PATH="$SYSROOT_LIBRARY_PATH:$LFS/usr/local/lib:$LFS/usr/lib:$LFS/lib:$LFS:$LFS/lib/gcc/${TRIPLE}/4.9.2"
+export LIBRARY_PATH="$SYSROOT_LIBRARY_PATH:$LFS/usr/local/lib:$LFS/usr/lib:$LFS/lib:$LFS:$LFS/lib/gcc/${TRIPLE}/$GCC_VERSION"
 export LD_LIBRARY_PATH="$LIBRARY_PATH"
 export CPATH="$SYSROOT_CPATH"
 export LANG=/usr/lib/locale/en_US
