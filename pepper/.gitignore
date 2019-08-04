@@ -4,6 +4,7 @@ apple
 sysroot
 *.tar.gz
 binutils-*
+gcc-*
 icu-*
 libuuid-*
 libxml2-*
