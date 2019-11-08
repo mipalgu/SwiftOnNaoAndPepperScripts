@@ -85,8 +85,8 @@ then
       -DCMAKE_C_COMPILER_TARGET="$TRIPLE" \
       -DCMAKE_CXX_COMPILER="$HOST_CLANGXX" \
       -DCMAKE_CXX_COMPILER_TARGET="$TRIPLE" \
-      -DCMAKE_C_FLAGS="$INCLUDE_FLAGS $BINARY_FLAGS" \
-      -DCMAKE_CXX_FLAGS="$INCLUDE_FLAGS $BINARY_FLAGS" \
+      -DCMAKE_C_FLAGS="-gcc-toolchain $CROSS_DIR $INCLUDE_FLAGS $BINARY_FLAGS" \
+      -DCMAKE_CXX_FLAGS="-gcc-toolchain $CROSS_DIR $INCLUDE_FLAGS $BINARY_FLAGS" \
       -DCMAKE_EXE_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR" \
       -DCMAKE_SHARED_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR" \
       $SRC_DIR/cmark
@@ -123,8 +123,8 @@ then
       -DLLVM_TARGETS_TO_BUILD="X86" \
       -DLLVM_ENABLE_ASSERTIONS=TRUE \
       -DPYTHON_EXECUTABLE="${PYTHON}" \
-      -DCMAKE_C_FLAGS="-fno-stack-protector $INCLUDE_FLAGS $BINARY_FLAGS" \
-      -DCMAKE_CXX_FLAGS="-fpermissive $INCLUDE_FLAGS $BINARY_FLAGS" \
+      -DCMAKE_C_FLAGS="-gcc-toolchain $CROSS_DIR -fno-stack-protector $INCLUDE_FLAGS $BINARY_FLAGS" \
+      -DCMAKE_CXX_FLAGS="-gcc-toolchain $CROSS_DIR -fpermissive $INCLUDE_FLAGS $BINARY_FLAGS" \
       -DCMAKE_EXE_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR" \
       -DCMAKE_SHARED_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR" \
       -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
@@ -177,8 +177,8 @@ then
       -DSWIFT_PRIMARY_VARIANT_SDK="LINUX" \
       -DSWIFT_PRIMARY_VARIANT_ARCH="$ARCH" \
       -DSWIFT_PRIMARY_VARIANT_TRIPLE="$TRIPLE" \
-      -DCMAKE_C_FLAGS="-Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS" \
-      -DCMAKE_CXX_FLAGS="-Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS" \
+      -DCMAKE_C_FLAGS="-gcc-toolchain $CROSS_DIR -Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS" \
+      -DCMAKE_CXX_FLAGS="-gcc-toolchain $CROSS_DIR -Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS" \
       -DCMAKE_EXE_LINKER_FLAGS="$LINK_FLAGS -gcc-toolchain $CROSS_DIR -fno-use-cxa-atexit -luuid -lpthread -fvisibility=protected -Bsymbolic" \
       -DCMAKE_SHARED_LINKER_FLAGS="$LINK_FLAGS -gcc-toolchain $CROSS_DIR -fno-use-cxa-atexit -luuid -lpthread -fvisibility=protected -Bsymbolic" \
       -DSWIFT_ENABLE_GOLD_LINKER=TRUE \
