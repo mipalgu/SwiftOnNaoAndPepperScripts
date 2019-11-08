@@ -22,7 +22,4 @@ LFS="$WD/sysroot"
 SRC_DIR=$WD/apple
 BUILD_DIR=$SRC_DIR/build
 INSTALL_PREFIX=$LFS/home/nao/swift-tc
-mkdir -p $SRC_DIR
-mkdir -p $BUILD_DIR
-mkdir -p $INSTALL_PREFIX
 export LANG=/usr/lib/locale/en_US

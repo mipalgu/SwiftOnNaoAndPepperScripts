@@ -3,6 +3,9 @@ set -e
 
 source setup.sh
 
+mkdir -p $SRC_DIR
+mkdir -p $BUILD_DIR
+
 if [ ! -d "binutils-$BINUTILS_VERSION" ]
 then
     [ ! -f "binutils-$BINUTILS_VERSION.tar.gz" ] && wget https://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_VERSION.tar.gz
