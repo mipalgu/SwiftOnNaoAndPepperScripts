@@ -24,4 +24,5 @@ source setup.sh
 source setup-sources.sh
 source setup-sysroot.sh
 source build-cross-binutils.sh
+source build-libuuid.sh
 source build-swift.sh
