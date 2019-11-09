@@ -144,7 +144,7 @@ then
     rm -rf $SWIFT_BUILD_DIR
     mkdir -p $SWIFT_BUILD_DIR
     cd $SWIFT_BUILD_DIR
-    cmake -G "Ninja" \
+    PATH="$CROSS_DIR/bin:$PATH" CC="$HOST_CLANG" CXX="$HOST_CLANGXX" CPATH="$CPATH" LIBRARY_PATH="$LIBRARY_PATH" cmake -G "Ninja" \
       -DLLVM_DIR="${SRCDIR/llvm}" \
       -DCMAKE_PREFIX_PATH="$PREFIX_PATH" \
       -DCMAKE_CROSSCOMPILING=TRUE \
@@ -177,8 +177,8 @@ then
       -DSWIFT_PRIMARY_VARIANT_SDK="LINUX" \
       -DSWIFT_PRIMARY_VARIANT_ARCH="$ARCH" \
       -DSWIFT_PRIMARY_VARIANT_TRIPLE="$TRIPLE" \
-      -DCMAKE_C_FLAGS="-gcc-toolchain $CROSS_DIR -Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS" \
-      -DCMAKE_CXX_FLAGS="-gcc-toolchain $CROSS_DIR -Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS" \
+      -DCMAKE_C_FLAGS="-gcc-toolchain $CROSS_DIR -Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS -I$CROSS_DIR/$TRIPLE/include/c++/$GCC_VERSION -I$CROSS_DIR/$TRIPLE/include/c++/$GCC_VERSION/$TRIPLE" \
+      -DCMAKE_CXX_FLAGS="-gcc-toolchain $CROSS_DIR -Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS -I$CROSS_DIR/$TRIPLE/include/c++/$GCC_VERSION -I$CROSS_DIR/$TRIPLE/include/c++/$GCC_VERSION/$TRIPLE" \
       -DCMAKE_EXE_LINKER_FLAGS="$LINK_FLAGS -gcc-toolchain $CROSS_DIR -fno-use-cxa-atexit -luuid -lpthread -fvisibility=protected -Bsymbolic" \
       -DCMAKE_SHARED_LINKER_FLAGS="$LINK_FLAGS -gcc-toolchain $CROSS_DIR -fno-use-cxa-atexit -luuid -lpthread -fvisibility=protected -Bsymbolic" \
       -DSWIFT_ENABLE_GOLD_LINKER=TRUE \
@@ -187,6 +187,12 @@ then
       -DLLVM_TABLEGEN_EXE=$LLVM_TABLEGEN \
       -DSWIFT_STDLIB_BUILD_TYPE="MinSizeRel" \
       -DSWIFT_SDK_LINUX_ARCH_${ARCH}_PATH="$LFS" \
+      -DSWIFT_LINUX_${ARCH}_ICU_UC="$CROSS_DIR/icu/lib/libicuuc.so" \
+      -DSWIFT_LINUX_${ARCH}_ICU_UC_INCLUDE="$CROSS_DIR/icu/include" \
+      -DSWIFT_LINUX_${ARCH}_ICU_I18N="$CROSS_DIR/icu/lib/libicui18n.so" \
+      -DSWIFT_LINUX_${ARCH}_ICU_I18N_INCLUDE="$CROSS_DIR/icu/include" \
+      -DLIBXML2_INCLUDE_DIR="$CROSS_DIR/xml2/include/libxml2" \
+      -DLIBXML2_LIBRARY="$CROSS_DIR/xml2/lib/libxml2.so" \
       $SRC_DIR/swift
     cd $SRC_DIR
     cmake --build $SWIFT_BUILD_DIR -- -j${PARALLEL}
