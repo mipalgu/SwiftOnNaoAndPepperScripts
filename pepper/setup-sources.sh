@@ -50,6 +50,13 @@ then
     mv icu icu-$ICU4C_VERSION
 fi
 
+if [ ! -d "libuuid-$UUID_VERSION" ]
+then
+    [ ! -f "libuuid-$UUID_VERSION.tar.gz" ] && wget http://sourceforge.net/projects/libuuid/files/libuuid-$UUID_VERSION.tar.gz/download
+    mv download libuuid-$UUID_VERSION.tar.gz
+    tar -xzf libuuid-$UUID_VERSION.tar.gz
+fi
+
 
 mkdir -p apple
 
