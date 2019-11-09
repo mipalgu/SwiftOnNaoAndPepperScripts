@@ -102,7 +102,7 @@ then
     rm -rf $LLVM_BUILD_DIR
     mkdir -p $LLVM_BUILD_DIR
     cd $LLVM_BUILD_DIR
-    PATH="$CROSS_DIR/bin:$PATH" CC="$HOST_CLANG" CXX="$HOST_CLANGXX" cmake -G "Ninja" \
+    PATH="$CROSS_DIR/bin:$PATH" CC="$HOST_CLANG" CXX="$HOST_CLANGXX" CPATH="$CPATH" LIBRARY_PATH="$LIBRARY_PATH" cmake -G "Ninja" \
       -DCMAKE_CROSSCOMPILING=TRUE \
       -DCMAKE_SYSTEM_NAME="Linux" \
       -DCMAKE_SYSROOT="$LFS" \
@@ -125,8 +125,8 @@ then
       -DPYTHON_EXECUTABLE="${PYTHON}" \
       -DCMAKE_C_FLAGS="-gcc-toolchain $CROSS_DIR -fno-stack-protector $INCLUDE_FLAGS $BINARY_FLAGS" \
       -DCMAKE_CXX_FLAGS="-gcc-toolchain $CROSS_DIR -fpermissive $INCLUDE_FLAGS $BINARY_FLAGS" \
-      -DCMAKE_EXE_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR" \
-      -DCMAKE_SHARED_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR" \
+      -DCMAKE_EXE_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR $LINK_FLAGS" \
+      -DCMAKE_SHARED_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR $LINK_FLAGS" \
       -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
       -DLLVM_USE_LINKER=gold \
       -DLLVM_INCLUDE_DOCS=TRUE \
