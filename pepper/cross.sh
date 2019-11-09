@@ -21,6 +21,4 @@ export LANG=/usr/lib/locale/C.UTF-8
 export BINARY_FLAGS=`echo "$GCC_TOOLCHAIN" | sed 's/^/ -B/g' | sed 's/:/ -B/g'`
 export INCLUDE_FLAGS=`echo "$PREFIX_INCLUDE_PATHS$SYSROOT_INCLUDE_PATH" | sed 's/^/ -I/g' | sed 's/:/ -I/g'`
 L_FLAGS=`echo "$PREFIX_LIBRARY_PATHS$SYSROOT_LIBRARY_PATH:$GCC_TOOLCHAIN" | sed 's/^/ -L/g' | sed 's/:/ -L/g'`
-echo "INCLUDE_FLAGS: $INCLUDE_FLAGS"
-echo "LFLAGS: $L_FLAGS"
 export LINK_FLAGS="-R$INSTALL_PREFIX/usr/local/lib -R$INSTALL_PREFIX/usr/lib -R$INSTALL_PREFIX/lib -R/usr/lib $L_FLAGS"
