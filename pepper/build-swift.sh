@@ -145,7 +145,6 @@ then
     mkdir -p $SWIFT_BUILD_DIR
     cd $SWIFT_BUILD_DIR
     PATH="$CROSS_DIR/bin:$PATH" CC="$HOST_CLANG" CXX="$HOST_CLANGXX" CPATH="$CPATH" LIBRARY_PATH="$LIBRARY_PATH" cmake -G "Ninja" \
-      -DLLVM_DIR="${SRCDIR/llvm}" \
       -DCMAKE_PREFIX_PATH="$PREFIX_PATH" \
       -DCMAKE_CROSSCOMPILING=TRUE \
       -DCMAKE_SYSROOT="$LFS" \
@@ -193,6 +192,9 @@ then
       -DSWIFT_LINUX_${ARCH}_ICU_I18N_INCLUDE="$CROSS_DIR/icu/include" \
       -DLIBXML2_INCLUDE_DIR="$CROSS_DIR/xml2/include/libxml2" \
       -DLIBXML2_LIBRARY="$CROSS_DIR/xml2/lib/libxml2.so" \
+      -DLLVM_DIR="$LLVM_BUILD_DIR/lib/cmake/llvm" \
+      -DClang_DIR="$LLVM_BUILD_DIR/lib/cmake/clang" \
+      -DSWIFT_INCLUDE_TOOLS=FALSE \
       $SRC_DIR/swift
     cd $SRC_DIR
     cmake --build $SWIFT_BUILD_DIR -- -j${PARALLEL}
