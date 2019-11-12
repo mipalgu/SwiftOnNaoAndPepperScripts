@@ -2,7 +2,7 @@
 set -e
 source setup.sh
 
-MIPAL_CROSS=$WD/$CROSS_DIR-mipal
+MIPAL_CROSS=$CROSS_DIR-mipal
 MIPAL_CROSSTOOLCHAIN=$WD/crosstoolchain
 
 # Create ctc.tar.gz
