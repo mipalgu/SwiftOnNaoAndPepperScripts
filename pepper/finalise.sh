@@ -27,6 +27,11 @@ then
     mv $MIPAL_CROSS/libexec $MIPAL_CROSS/cross/
     mv $MIPAL_CROSS/share $MIPAL_CROSS/cross/
     mv $MIPAL_CROSS/$TRIPLE $MIPAL_CROSS/cross/
+    ln -s libgcc_s.so $MIPAL_CROSS/cross/$TRIPLE/sysroot/lib/libgcc.so
+    ln -s ../../../../lib/gcc/$TRIPLE/$GCC_VERSION/crtbeginS.o $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/
+    ln -s ../../../../lib/gcc/$TRIPLE/$GCC_VERSION/crtbegin.o $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/
+    ln -s ../../../../lib/gcc/$TRIPLE/$GCC_VERSION/crtend.o $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/
+    ln -s ../../../../lib/gcc/$TRIPLE/$GCC_VERSION/crtendS.o $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/
     tar -czf ctc-mipal.tar.gz $MIPAL_CROSS
     touch $WD/.create-mipal-ctc
 fi
