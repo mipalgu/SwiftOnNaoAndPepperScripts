@@ -14,6 +14,7 @@ SWIFT_BUILD_DIR=$BUILD_DIR/swift-$PLATFORM/ninja
 LLBUILD_BUILD_DIR=$BUILD_DIR/llbuild-$PLATFORM
 FOUNDATION_BUILD_DIR=$BUILD_DIR/foundation-$PLATFORM
 DISPATCH_BUILD_DIR=$BUILD_DIR/libdispatch-$PLATFORM
+LIBDISPATCH_BUILD_DIR=$BUILD_DIR/libdispatch-$PLATFORM
 PYTHONPATH="$SRC_DIR/swift/utils"
 PYTHON="/usr/bin/python"
 BUILD_CLANG=$LLVM_BUILD_DIR/bin/clang
@@ -228,6 +229,33 @@ then
 fi
 
 cd $WD
+
+if [ ! -f $LIBDISPATCH_BUILD_DIR/.libdispatch-build-cross ]
+then
+    echo "Compiling libdispatch."
+    rm -rf $LIBDISPATCH_BUILD_DIR
+    mkdir -p $LIBDISPATCH_BUILD_DIR
+    cd $LIBDISPATCH_BUILD_DIR
+    PATH="$CROSS_DIR/bin:$PATH" CC="$HOST_CLANG" CXX="$HOST_CLANGXX" CPATH="$CPATH" LIBRARY_PATH="$LIBRARY_PATH" cmake -G "Ninja" \
+	    -DCMAKE_CROSSCOMPILING=TRUE \
+	    -DCMAKE_SYSTEM_NAME="Linux" \
+	    -DCMAKE_SYSROOT="$LFS" \
+	    -DCMAKE_C_COMPILER="$HOST_CLANG" \
+	    -DCMAKE_C_COMPILER_TARGET="$TRIPLE" \
+	    -DCMAKE_CXX_COMPILER="$HOST_CLANGXX" \
+	    -DCMAKE_CXX_COMPILER_TARGET="$TRIPLE" \
+	    -DINSTALL_LIBDIR="$INSTALL_PREFIX/lib" \
+            -DCMAKE_C_FLAGS="-gcc-toolchain $CROSS_DIR -fno-stack-protector $INCLUDE_FLAGS $BINARY_FLAGS" \
+            -DCMAKE_CXX_FLAGS="-gcc-toolchain $CROSS_DIR -fpermissive $INCLUDE_FLAGS $BINARY_FLAGS" \
+            -DCMAKE_EXE_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR $LINK_FLAGS" \
+            -DCMAKE_SHARED_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR $LINK_FLAGS" \
+            -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+	    $SRC_DIR/swift-corelibs-libdispatch
+    cd $SRC_DIR
+    PATH="$CROSS_DIR/bin:$PATH" cmake --build $LIBDISPATCH_BUILD_DIR
+    PATH="$CROSS_DIR/bin:$PATH" cd $LIBDISPATCH_BUILD_DIR && ninja install
+    touch $LIBDISPATCH_BUILD_DIR/.libdispatch-build-cross
+fi
 
 #COMMAND="/usr/local/var/swiftenv/versions/5.0/usr/bin/clang -o hello main.o ${LINK_FLAGS} -L$INSTALL_PREFIX/lib/swift/linux -lswiftCore -lswiftSwiftOnoneSupport -target $TRIPLE"
 #echo "$COMMAND"
