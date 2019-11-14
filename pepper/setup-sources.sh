@@ -86,3 +86,19 @@ then
     git checkout "$tag"
     cd ../..
 fi
+
+if [ "$BUILD_LIBCXX" = true ]
+then
+    if [ ! -d "apple/libcxxabi" ]
+    then
+        if [ ! -f "libcxxabi-9.0.0.src.tar.xz" ]
+        then
+            wget http://releases.llvm.org/9.0.0/libcxxabi-9.0.0.src.tar.xz
+        fi
+        cd "$SRC_DIR"
+	rm -rf libcxxabi
+        tar -xvf $WD/libcxxabi-9.0.0.src.tar.xz
+	mv libcxxabi-9.0.0.src libcxxabi
+        cd $WD
+    fi
+fi

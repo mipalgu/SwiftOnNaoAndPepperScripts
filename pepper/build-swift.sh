@@ -24,6 +24,12 @@ LLVM_TABLEGEN=$LLVM_HOST_BUILD_DIR/bin/llvm-tblgen
 CLANG_TABLEGEN=$LLVM_HOST_BUILD_DIR/bin/clang-tblgen
 HOST_SWIFT=/usr/local/var/swiftenv/shims/swift
 
+LLVM_CROSS_PROJECTS="clang"
+if [ "$BUILD_LIBCXX" = true ]
+then
+    LLVM_CROSS_PROJECTS="$LLVM_CROSS_PROJECTS;libcxx;libcxxabi"
+fi
+
 cd $SRC_DIR
 cd llvm/tools
 rm -f clang
@@ -65,6 +71,16 @@ fi
 cd $WD
 source cross.sh
 rm -f $SRC_DIR/llvm/tools/compiler-rt
+cd $SRC_DIR
+cd llvm/tools
+rm -f libcxx
+rm -f libcxxabi
+
+if [ "$BUILD_LIBCXX" = true ]
+then
+    ln -s $SRC_DIR/libcxx .
+    ln -s $SRC_DIR/libcxxabi .
+fi
 
 if [ ! -f $CMARK_BUILD_DIR/.cmark-build-cross ]
 then
@@ -118,6 +134,7 @@ then
       -DCMAKE_ASM_COMPILER="$HOST_CLANG" \
       -DLLVM_TABLEGEN=$LLVM_TABLEGEN \
       -DCLANG_TABLEGEN=$CLANG_TABLEGEN \
+      -DLLVM_ENABLE_PROJECTS="$LLVM_CROSS_PROJECTS" \
       -DLLVM_DEFAULT_TARGET_TRIPLE="${TRIPLE}" \
       -DLLVM_TARGET_ARCH="${ARCH}" \
       -DLLVM_TARGETS_TO_BUILD="X86" \

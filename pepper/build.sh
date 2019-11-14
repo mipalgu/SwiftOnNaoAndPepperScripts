@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
-usage() { echo "Usage: $0 [-j<value>]"; }
+usage() { echo "Usage: $0 [-j<value>] -l"; }
 
-while getopts "j:h" o; do
+BUILD_LIBCXX=false
+
+while getopts "j:hl" o; do
     case "${o}" in
         h)
             usage
@@ -12,6 +14,9 @@ while getopts "j:h" o; do
         j)
             PARALLEL=${OPTARG}
             ;;
+	l)
+            BUILD_LIBCXX=true
+	    ;;
         *)
             echo "Invalid argument ${o}"
             usage 1>&2
