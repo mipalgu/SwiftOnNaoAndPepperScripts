@@ -27,6 +27,10 @@ then
     mv $MIPAL_CROSS/share $MIPAL_CROSS/cross/
     mv $MIPAL_CROSS/$TRIPLE $MIPAL_CROSS/cross/
     ln -s libgcc_s.so $MIPAL_CROSS/cross/$TRIPLE/sysroot/lib/libgcc.so
+    rm -f $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/crtbeginS.o
+    rm -f $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/crtbegin.o
+    rm -f $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/crtend.o
+    rm -f $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/crtendS.o
     ln -s ../../../../lib/gcc/$TRIPLE/$GCC_VERSION/crtbeginS.o $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/
     ln -s ../../../../lib/gcc/$TRIPLE/$GCC_VERSION/crtbegin.o $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/
     ln -s ../../../../lib/gcc/$TRIPLE/$GCC_VERSION/crtend.o $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/
