@@ -231,7 +231,14 @@ fi
 cd $WD
 source compile-swiftenv-tc.sh
 
+ln -sf libgcc_s.so $LFS/lib/libgcc.so
+cp -f $CROSS_DIR/lib/gcc/$TRIPLE/$GCC_VERSION/crtbeginS.o $LFS/usr/lib
+cp -f $CROSS_DIR/lib/gcc/$TRIPLE/$GCC_VERSION/crtbegin.o $LFS/usr/lib
+cp -f $CROSS_DIR/lib/gcc/$TRIPLE/$GCC_VERSION/crtend.o $LFS/usr/lib
+cp -f $CROSS_DIR/lib/gcc/$TRIPLE/$GCC_VERSION/crtendS.o $LFS/usr/lib
+
 swift_include_flags=`echo "$INCLUDE_FLAGS" | sed 's/ /;/g'`
+#swift_link_flags=`echo "$LINK_FLAGS" | sed 's/ /;-Xlinker;/g' | sed 's/^/-Xlinker;/g'`
 if [ ! -f $LIBDISPATCH_BUILD_DIR/.libdispatch-build-cross ]
 then
     echo "Compiling libdispatch."
@@ -256,16 +263,17 @@ then
             -DCMAKE_SHARED_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR $LINK_FLAGS" \
 	    -DENABLE_SWIFT=YES \
 	    -DCMAKE_SWIFT_COMPILER="/usr/local/var/swiftenv/shims/swiftc" \
-	    -DCMAKE_SWIFT_FLAGS="-I$INSTALL_PREFIX/lib/swift/linux/i686;$swift_include_flags;-I$LFS/usr/include;-I$LFS/include;-I$CROSS_DIR/lib/gcc/$TRIPLE/$GCC_VERSION/include-fixed" \
+	    -DCMAKE_SWIFT_FLAGS="-I$INSTALL_PREFIX/lib/swift/linux/i686;$swift_include_flags;-I$LFS/usr/include;-I$LFS/include;-I$CROSS_DIR/lib/gcc/$TRIPLE/$GCC_VERSION/include-fixed;-sdk;$LFS" \
 	    -DAST_TARGET="$TRIPLE" \
-	    -DCMAKE_SWIFT_LINK_FLAGS="-L$INSTALL_PREFIX/swift/linux" \
+	    -DCMAKE_SWIFT_LINK_FLAGS="-L$INSTALL_PREFIX/swift/linux;-L$INSTALL_PREFIX/lib/swift/linux;-L$INSTALL_PREFIX/lib;-L$LFS/usr/lib;-L$LFS/lib;-sdk;$LFS;-target;$TRIPLE" \
             -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
-	    -DCMAKE_SYSTEM_PROCESSOR=x86_64 \
+	    -DCMAKE_SYSTEM_PROCESSOR=$ARCH \
 	    $SRC_DIR/swift-corelibs-libdispatch
     cd $SRC_DIR
     PATH="$CROSS_DIR/bin:$PATH" cmake --build $LIBDISPATCH_BUILD_DIR
     PATH="$CROSS_DIR/bin:$PATH" cd $LIBDISPATCH_BUILD_DIR && ninja install
-    /usr/local/var/swiftenv/bin/swiftenv local $swifenv_swift_version
+    cd $WD
+    /usr/local/var/swiftenv/bin/swiftenv local $swiftenv_swift_version
     touch $LIBDISPATCH_BUILD_DIR/.libdispatch-build-cross
 fi
 
