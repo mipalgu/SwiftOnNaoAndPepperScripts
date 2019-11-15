@@ -11,3 +11,4 @@ libxml2-*
 xz-*
 zlib-*
 .swift-version
+crosstoolchain
