@@ -229,17 +229,22 @@ then
 fi
 
 cd $WD
+source compile-swiftenv-tc.sh
 
+swift_include_flags=`echo "$INCLUDE_FLAGS" | sed 's/ /;/g'`
 if [ ! -f $LIBDISPATCH_BUILD_DIR/.libdispatch-build-cross ]
 then
     echo "Compiling libdispatch."
+    /usr/local/var/swiftenv/bin/swiftenv local $swiftenv_swift_version-pepper
     rm -rf $LIBDISPATCH_BUILD_DIR
     mkdir -p $LIBDISPATCH_BUILD_DIR
     cd $LIBDISPATCH_BUILD_DIR
-    PATH="$CROSS_DIR/bin:$PATH" CC="$HOST_CLANG" CXX="$HOST_CLANGXX" CPATH="$CPATH" LIBRARY_PATH="$LIBRARY_PATH" cmake -G "Ninja" \
+    PATH="$CROSS_DIR/bin:$PATH" CC="$HOST_CLANG" CXX="$HOST_CLANGXX" CPATH="$CPATH" LIBRARY_PATH="$LIBRARY_PATH" LD="$CROSS_DIR/bin/$TRIPLE-ld.gold" cmake -G "Ninja" \
 	    -DCMAKE_CROSSCOMPILING=TRUE \
 	    -DCMAKE_SYSTEM_NAME="Linux" \
 	    -DCMAKE_SYSROOT="$LFS" \
+	    -DCMAKE_AR="$CROSS_DIR/bin/$TRIPLE-ar" \
+	    -DCMAKE_LINKER="$CROSS_DIR/bin/$TRIPLE-ld.gold" \
 	    -DCMAKE_C_COMPILER="$HOST_CLANG" \
 	    -DCMAKE_C_COMPILER_TARGET="$TRIPLE" \
 	    -DCMAKE_CXX_COMPILER="$HOST_CLANGXX" \
@@ -249,11 +254,18 @@ then
             -DCMAKE_CXX_FLAGS="-gcc-toolchain $CROSS_DIR -fpermissive $INCLUDE_FLAGS $BINARY_FLAGS" \
             -DCMAKE_EXE_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR $LINK_FLAGS" \
             -DCMAKE_SHARED_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR $LINK_FLAGS" \
+	    -DENABLE_SWIFT=YES \
+	    -DCMAKE_SWIFT_COMPILER="/usr/local/var/swiftenv/shims/swiftc" \
+	    -DCMAKE_SWIFT_FLAGS="-I$INSTALL_PREFIX/lib/swift/linux/i686;$swift_include_flags;-I$LFS/usr/include;-I$LFS/include;-I$CROSS_DIR/lib/gcc/$TRIPLE/$GCC_VERSION/include-fixed" \
+	    -DAST_TARGET="$TRIPLE" \
+	    -DCMAKE_SWIFT_LINK_FLAGS="-L$INSTALL_PREFIX/swift/linux" \
             -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+	    -DCMAKE_SYSTEM_PROCESSOR=x86_64 \
 	    $SRC_DIR/swift-corelibs-libdispatch
     cd $SRC_DIR
     PATH="$CROSS_DIR/bin:$PATH" cmake --build $LIBDISPATCH_BUILD_DIR
     PATH="$CROSS_DIR/bin:$PATH" cd $LIBDISPATCH_BUILD_DIR && ninja install
+    /usr/local/var/swiftenv/bin/swiftenv local $swifenv_swift_version
     touch $LIBDISPATCH_BUILD_DIR/.libdispatch-build-cross
 fi
 
