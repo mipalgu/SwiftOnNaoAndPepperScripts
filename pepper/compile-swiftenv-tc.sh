@@ -10,14 +10,11 @@ if [ "${#version}" -gt "7" ]
 then
     if [ ${version: -7} == "-pepper" ]
     then
-        echo "change: $version"
         version=${version::${#version}-7}
         swiftenv_swift_version=$version
         /usr/local/var/swiftenv/bin/swiftenv local $swiftenv_swift_version
     fi
 fi
-
-echo "$version"
 
 if [ ! -d $swiftenv_dir/versions/$version-pepper ]
 then
