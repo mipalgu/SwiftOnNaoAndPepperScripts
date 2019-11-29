@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
-usage() { echo "Usage: $0 [-j<value>] -l"; }
+source setup.sh
 
-BUILD_LIBCXX=false
+usage() { echo "Usage: $0 [-j<value>] -l -s <swift-version> -t <swift-tag>"; }
 
-while getopts "j:hl" o; do
+while getopts "j:hls:t:" o; do
     case "${o}" in
         h)
             usage
@@ -17,6 +17,12 @@ while getopts "j:hl" o; do
 	l)
             BUILD_LIBCXX=true
 	    ;;
+	s)
+	    SWIFT_VERSION=swift-${OPTARG}-RELEASE
+	    ;;
+	t)
+	    SWIFT_VERSION=${OPTARG}
+	    ;;
         *)
             echo "Invalid argument ${o}"
             usage 1>&2
@@ -25,7 +31,6 @@ while getopts "j:hl" o; do
     esac
 done
 
-source setup.sh
 source setup-sources.sh
 source setup-sysroot.sh
 source build-cross-binutils.sh
