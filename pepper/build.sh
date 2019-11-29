@@ -14,15 +14,15 @@ while getopts "j:hls:t:" o; do
         j)
             PARALLEL=${OPTARG}
             ;;
-	l)
+        l)
             BUILD_LIBCXX=true
-	    ;;
-	s)
-	    SWIFT_VERSION=swift-${OPTARG}-RELEASE
-	    ;;
-	t)
-	    SWIFT_VERSION=${OPTARG}
-	    ;;
+	        ;;
+        s)
+	        SWIFT_VERSION=swift-${OPTARG}-RELEASE
+	        ;;
+        t)
+	        SWIFT_VERSION=${OPTARG}
+	        ;;
         *)
             echo "Invalid argument ${o}"
             usage 1>&2
