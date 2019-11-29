@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 set +h
+
+
+if [ -z "$SETUP_SH_INCLUDED" ]
+then
+SETUP_SH_INCLUDED=yes
+
 umask 022
-
 source versions.sh
-
+BUILD_LIBCXX=false
 PARALLEL=${PARALLEL-1}
 WD=`pwd`
 ARCH=i686
@@ -23,3 +28,5 @@ SRC_DIR=$WD/apple
 BUILD_DIR=$SRC_DIR/build
 INSTALL_PREFIX=$LFS/home/nao/swift-tc
 export LANG=/usr/lib/locale/en_US
+
+fi # End SETUP_SH_INCLUDED
