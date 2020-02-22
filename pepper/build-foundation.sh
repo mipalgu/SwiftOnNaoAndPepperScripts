@@ -6,6 +6,7 @@ source cross.sh
 source compile-swiftenv-tc.sh
 
 swift_include_flags=`echo "$INCLUDE_FLAGS -I$INSTALL_PREFIX/lib/swift -I$INSTALL_PREFIX/lib/swift/clang/include" | sed 's/ /;/g'`
+swift_link_flags=`echo "$LINK_FLAGS" | sed 's/^/-Xlinker;/g' | sed 's/  / /g' | sed 's/ /;-Xlinker;/g'`
 
 if [ ! -f $FOUNDATION_BUILD_DIR/.foundation-build-cross ]
 then
@@ -18,6 +19,8 @@ then
 	    -DCMAKE_CROSSCOMPILING=TRUE \
 	    -DCMAKE_SYSTEM_NAME="Linux" \
 	    -DCMAKE_SYSROOT="$LFS" \
+	    -DCMAKE_ASM_COMPILER="$HOST_CLANG" \
+	    -DCMAKE_RANLIB="$CROSS_DIR/bin/$TRIPLE-ranlib" \
 	    -DCMAKE_AR="$CROSS_DIR/bin/$TRIPLE-ar" \
 	    -DCMAKE_LINKER="$CROSS_DIR/bin/$TRIPLE-ld.gold" \
 	    -DCMAKE_C_COMPILER="$HOST_CLANG" \
@@ -25,6 +28,7 @@ then
 	    -DCMAKE_CXX_COMPILER="$HOST_CLANGXX" \
 	    -DCMAKE_CXX_COMPILER_TARGET="$TRIPLE" \
 	    -DINSTALL_LIBDIR="$INSTALL_PREFIX/lib" \
+            -DCMAKE_ASM_FLAGS="-gcc-toolchain $CROSS_DIR -target $TRIPLE" \
             -DCMAKE_C_FLAGS="-gcc-toolchain $CROSS_DIR -fno-stack-protector $INCLUDE_FLAGS $BINARY_FLAGS -I$INSTALL_PREFIX/lib/swift/Block -I$INSTALL_PREFIX/lib/swift" \
             -DCMAKE_CXX_FLAGS="-gcc-toolchain $CROSS_DIR -fpermissive $INCLUDE_FLAGS $BINARY_FLAGS -I$INSTALL_PREFIX/lib/swift/Block -I$INSTALL_PREFIX/lib/swift" \
             -DCMAKE_EXE_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR $LINK_FLAGS" \
@@ -34,10 +38,11 @@ then
 	    -DCMAKE_LIBRARY_PATH="$CROSS_TOOLCHAIN_DIR/curl/lib;$INSTALL_PREFIX/lib" \
 	    -DENABLE_SWIFT=YES \
 	    -DCMAKE_SWIFT_COMPILER="/usr/local/var/swiftenv/shims/swiftc" \
-	    -DCMAKE_SWIFT_FLAGS="-I$INSTALL_PREFIX/lib/swift/linux/i686;$swift_include_flags;-I$LFS/usr/include;-I$LFS/include;-I$CROSS_DIR/lib/gcc/$TRIPLE/$GCC_VERSION/include-fixed;-sdk;$LFS;" \
+	    -DCMAKE_SWIFT_FLAGS="-I$INSTALL_PREFIX/lib/swift/linux/i686;$swift_include_flags;-I$LFS/usr/include;-I$LFS/include;-I$CROSS_DIR/lib/gcc/$TRIPLE/$GCC_VERSION/include-fixed;-sdk;$LFS;$swift_link_flags;" \
 	    -DAST_TARGET="$TRIPLE" \
 	    -DCMAKE_SWIFT_LINK_FLAGS="-L$INSTALL_PREFIX/swift/linux;-L$INSTALL_PREFIX/lib/swift/linux;-L$INSTALL_PREFIX/lib;-L$LFS/usr/lib;-L$LFS/lib;-sdk;$LFS;-target;$TRIPLE" \
             -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+	    -DBUILD_SHARED_LIBS=YES \
 	    -DCMAKE_SYSTEM_PROCESSOR=$ARCH \
 	    $SRC_DIR/swift-corelibs-foundation
     cd $SRC_DIR
