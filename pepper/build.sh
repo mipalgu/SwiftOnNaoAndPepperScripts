@@ -9,5 +9,6 @@ source build-libuuid.sh
 source build-host-llvm.sh
 source build-target-llvm.sh
 source build-swift.sh
-source build-frameworks.sh
+source build-libdispatch.sh
+source build-foundation.sh
 source finalise.sh
