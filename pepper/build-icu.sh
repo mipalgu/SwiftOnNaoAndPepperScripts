@@ -3,7 +3,7 @@ set -e
 
 source setup.sh
 
-if [ ! -f $INSTALL_PREFIX/lib/libicu.so ]
+if [ ! -f $INSTALL_PREFIX/lib/libicuuc.so ]
 then
     if [ ! -f $WD/build-host-icu/.icu-build-host ]
     then
@@ -18,7 +18,7 @@ then
     rm -rf $WD/build-target-icu
     mkdir $WD/build-target-icu
     cd $WD/build-target-icu
-    PATH="$CROSS_TOOLCHAIN_DIR/bin:$PATH" $SRC_DIR/icu/icu4c/source/configure --prefix="$INSTALL_PREFIX" --host="$TRIPLE" --with-sysroot="$LFS" --with-cross-build="$WD/build-host-icu" --with-library-bits=32
+    PATH="$CROSS_TOOLCHAIN_DIR/bin:$PATH" $SRC_DIR/icu/icu4c/source/configure --prefix="$INSTALL_PREFIX" --host="$TRIPLE" --with-sysroot="$LFS" --with-cross-build="$WD/build-host-icu" --with-library-bits=32 --disable-layoutex
     PATH="$CROSS_TOOLCHAIN_DIR/bin:$PATH" make -j${PARALLEL}
     PATH="$CROSS_TOOLCHAIN_DIR/bin:$PATH" make install
     cd $WD
