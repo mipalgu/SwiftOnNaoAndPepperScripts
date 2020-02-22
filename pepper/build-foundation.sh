@@ -7,7 +7,6 @@ source compile-swiftenv-tc.sh
 
 swift_include_flags=`echo "$INCLUDE_FLAGS -I$INSTALL_PREFIX/lib/swift -I$INSTALL_PREFIX/lib/swift/clang/include" | sed 's/ /;/g'`
 swift_link_flags=`echo "$LINK_FLAGS" | sed 's/^/-Xlinker;/g' | sed 's/  / /g' | sed 's/ /;-Xlinker;/g'`
-echo "$swift_link_flags"
 
 if [ ! -f $FOUNDATION_BUILD_DIR/.foundation-build-cross ]
 then
