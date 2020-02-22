@@ -42,14 +42,6 @@ then
     cd $WD
 fi
 
-if [ ! -d "icu-$ICU4C_VERSION" ]
-then
-    [ ! -f "icu4c-$ICU4C_VERSION.tar.gz" ] && wget http://download.icu-project.org/files/icu4c/$ICU4C_MAJOR_VERSION.$ICU4C_MINOR_VERSION/icu4c-$ICU4C_VERSION-src.tgz
-    mv icu4c-$ICU4C_VERSION-src.tgz icu4c-$ICU4C_VERSION.tar.gz
-    tar -xzf icu4c-$ICU4C_VERSION.tar.gz
-    mv icu icu-$ICU4C_VERSION
-fi
-
 if [ ! -d "libuuid-$UUID_VERSION" ]
 then
     [ ! -f "libuuid-$UUID_VERSION.tar.gz" ] && wget http://sourceforge.net/projects/libuuid/files/libuuid-$UUID_VERSION.tar.gz/download
