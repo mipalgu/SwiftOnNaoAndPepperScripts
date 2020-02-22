@@ -42,12 +42,14 @@ then
     cd $WD
 fi
 
-if [ ! -d "icu-$ICU4C_VERSION" ]
+if [ ! -d "icu-le-hb-$ICU_LE_HB_VERSION" ]
 then
-    [ ! -f "icu4c-$ICU4C_VERSION.tar.gz" ] && wget http://download.icu-project.org/files/icu4c/$ICU4C_MAJOR_VERSION.$ICU4C_MINOR_VERSION/icu4c-$ICU4C_VERSION-src.tgz
-    mv icu4c-$ICU4C_VERSION-src.tgz icu4c-$ICU4C_VERSION.tar.gz
-    tar -xzf icu4c-$ICU4C_VERSION.tar.gz
-    mv icu icu-$ICU4C_VERSION
+    if [ ! -f "icu-le-hb-$ICU_LE_HB_VERSION.tar.gz" ]
+    then
+        wget https://github.com/harfbuzz/icu-le-hb/archive/$ICU_LE_HB_VERSION.tar.gz
+        mv $ICU_LE_HB_VERSION.tar.gz icu-le-hb-$ICU_LE_HB_VERSION.tar.gz
+    fi
+    tar -xzf icu-le-hb-$ICU_LE_HB_VERSION.tar.gz
 fi
 
 if [ ! -d "libuuid-$UUID_VERSION" ]
