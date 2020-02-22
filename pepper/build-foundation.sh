@@ -5,7 +5,7 @@ source build-config.sh
 source cross.sh
 source compile-swiftenv-tc.sh
 
-swift_include_flags=`echo "$INCLUDE_FLAGS" | sed 's/ /;/g'`
+swift_include_flags=`echo "$INCLUDE_FLAGS -I$INSTALL_PREFIX/lib/swift -I$INSTALL_PREFIX/lib/swift/clang/include" | sed 's/ /;/g'`
 
 if [ ! -f $FOUNDATION_BUILD_DIR/.foundation-build-cross ]
 then
@@ -30,11 +30,11 @@ then
             -DCMAKE_EXE_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR $LINK_FLAGS" \
             -DCMAKE_SHARED_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR $LINK_FLAGS" \
 	    -DCURL_INCLUDE_DIR="$CROSS_TOOLCHAIN_DIR/curl/include" \
-	    -DICU_INCLUDE_DIR="$CROSS_TOOLCHAIN_DIR/icu/include" \
-	    -DCMAKE_LIBRARY_PATH="$CROSS_TOOLCHAIN_DIR/curl/lib;$CROSS_TOOLCHAIN_DIR/icu/lib" \
+	    -DICU_INCLUDE_DIR="$INSTALL_PREFIX/include" \
+	    -DCMAKE_LIBRARY_PATH="$CROSS_TOOLCHAIN_DIR/curl/lib;$INSTALL_PREFIX/lib" \
 	    -DENABLE_SWIFT=YES \
 	    -DCMAKE_SWIFT_COMPILER="/usr/local/var/swiftenv/shims/swiftc" \
-	    -DCMAKE_SWIFT_FLAGS="-I$INSTALL_PREFIX/lib/swift/linux/i686;$swift_include_flags;-I$LFS/usr/include;-I$LFS/include;-I$CROSS_DIR/lib/gcc/$TRIPLE/$GCC_VERSION/include-fixed;-sdk;$LFS" \
+	    -DCMAKE_SWIFT_FLAGS="-I$INSTALL_PREFIX/lib/swift/linux/i686;$swift_include_flags;-I$LFS/usr/include;-I$LFS/include;-I$CROSS_DIR/lib/gcc/$TRIPLE/$GCC_VERSION/include-fixed;-sdk;$LFS;" \
 	    -DAST_TARGET="$TRIPLE" \
 	    -DCMAKE_SWIFT_LINK_FLAGS="-L$INSTALL_PREFIX/swift/linux;-L$INSTALL_PREFIX/lib/swift/linux;-L$INSTALL_PREFIX/lib;-L$LFS/usr/lib;-L$LFS/lib;-sdk;$LFS;-target;$TRIPLE" \
             -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
