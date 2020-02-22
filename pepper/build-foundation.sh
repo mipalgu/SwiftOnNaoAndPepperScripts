@@ -7,6 +7,7 @@ source compile-swiftenv-tc.sh
 
 swift_include_flags=`echo "$INCLUDE_FLAGS -I$INSTALL_PREFIX/lib/swift -I$INSTALL_PREFIX/lib/swift/clang/include" | sed 's/ /;/g'`
 swift_link_flags=`echo "$LINK_FLAGS" | sed 's/^/-Xlinker;/g' | sed 's/  / /g' | sed 's/ /;-Xlinker;/g'`
+echo "$swift_link_flags"
 
 if [ ! -f $FOUNDATION_BUILD_DIR/.foundation-build-cross ]
 then
@@ -19,6 +20,7 @@ then
 	    -DCMAKE_CROSSCOMPILING=TRUE \
 	    -DCMAKE_SYSTEM_NAME="Linux" \
 	    -DCMAKE_SYSROOT="$LFS" \
+	    -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
 	    -DCMAKE_ASM_COMPILER="$HOST_CLANG" \
 	    -DCMAKE_RANLIB="$CROSS_DIR/bin/$TRIPLE-ranlib" \
 	    -DCMAKE_AR="$CROSS_DIR/bin/$TRIPLE-ar" \
@@ -27,7 +29,6 @@ then
 	    -DCMAKE_C_COMPILER_TARGET="$TRIPLE" \
 	    -DCMAKE_CXX_COMPILER="$HOST_CLANGXX" \
 	    -DCMAKE_CXX_COMPILER_TARGET="$TRIPLE" \
-	    -DINSTALL_LIBDIR="$INSTALL_PREFIX/lib" \
             -DCMAKE_ASM_FLAGS="-gcc-toolchain $CROSS_DIR -target $TRIPLE" \
             -DCMAKE_C_FLAGS="-gcc-toolchain $CROSS_DIR -fno-stack-protector $INCLUDE_FLAGS $BINARY_FLAGS -I$INSTALL_PREFIX/lib/swift/Block -I$INSTALL_PREFIX/lib/swift" \
             -DCMAKE_CXX_FLAGS="-gcc-toolchain $CROSS_DIR -fpermissive $INCLUDE_FLAGS $BINARY_FLAGS -I$INSTALL_PREFIX/lib/swift/Block -I$INSTALL_PREFIX/lib/swift" \
@@ -35,8 +36,7 @@ then
             -DCMAKE_SHARED_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR $LINK_FLAGS" \
 	    -DCURL_INCLUDE_DIR="$CROSS_TOOLCHAIN_DIR/curl/include" \
 	    -DICU_INCLUDE_DIR="$INSTALL_PREFIX/include" \
-	    -DCMAKE_LIBRARY_PATH="$CROSS_TOOLCHAIN_DIR/curl/lib;$INSTALL_PREFIX/lib" \
-	    -DENABLE_SWIFT=YES \
+	    -DCMAKE_LIBRARY_PATH="$CROSS_TOOLCHAIN_DIR/curl/lib;$INSTALL_PREFIX/lib;$CROSS_TOOLCHAIN_DIR/xml2/lib" \
 	    -DCMAKE_SWIFT_COMPILER="/usr/local/var/swiftenv/shims/swiftc" \
 	    -DCMAKE_SWIFT_FLAGS="-I$INSTALL_PREFIX/lib/swift/linux/i686;$swift_include_flags;-I$LFS/usr/include;-I$LFS/include;-I$CROSS_DIR/lib/gcc/$TRIPLE/$GCC_VERSION/include-fixed;-sdk;$LFS;$swift_link_flags;" \
 	    -DAST_TARGET="$TRIPLE" \
