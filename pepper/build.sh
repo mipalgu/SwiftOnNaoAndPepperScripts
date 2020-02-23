@@ -12,4 +12,5 @@ source build-target-llvm.sh
 source build-swift.sh
 source build-libdispatch.sh
 source build-foundation.sh
+source build-xctest.sh
 source finalise.sh
