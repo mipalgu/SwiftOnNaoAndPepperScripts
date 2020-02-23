@@ -55,10 +55,10 @@ then
       -DLLVM_TABLEGEN_EXE=$LLVM_TABLEGEN \
       -DSWIFT_STDLIB_BUILD_TYPE="MinSizeRel" \
       -DSWIFT_SDK_LINUX_ARCH_${ARCH}_PATH="$LFS" \
-      -DSWIFT_LINUX_${ARCH}_ICU_UC="$CROSS_DIR/icu/lib/libicuuc.so" \
-      -DSWIFT_LINUX_${ARCH}_ICU_UC_INCLUDE="$CROSS_DIR/icu/include" \
-      -DSWIFT_LINUX_${ARCH}_ICU_I18N="$CROSS_DIR/icu/lib/libicui18n.so" \
-      -DSWIFT_LINUX_${ARCH}_ICU_I18N_INCLUDE="$CROSS_DIR/icu/include" \
+      -DSWIFT_LINUX_${ARCH}_ICU_UC="$INSTALL_PREFIX/lib/libicuuc.so" \
+      -DSWIFT_LINUX_${ARCH}_ICU_UC_INCLUDE="$INSTALL_PREFIX/include" \
+      -DSWIFT_LINUX_${ARCH}_ICU_I18N="$INSTALL_PREFIX/lib/libicui18n.so" \
+      -DSWIFT_LINUX_${ARCH}_ICU_I18N_INCLUDE="$INSTALL_PREFIX/include" \
       -DLIBXML2_INCLUDE_DIR="$CROSS_DIR/xml2/include/libxml2" \
       -DLIBXML2_LIBRARY="$CROSS_DIR/xml2/lib/libxml2.so" \
       -DLLVM_DIR="$LLVM_BUILD_DIR/lib/cmake/llvm" \
