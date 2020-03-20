@@ -18,15 +18,22 @@ export PATH LIBRARY_PATH CPATH
 INSTALL_PREFIX=$LFS/usr
 
 # Zlib
-rm -rf zlib-$ZLIB_VERSION
-tar -xzvf zlib-$ZLIB_VERSION.tar.gz
-rm -rf $SRC_DIR/build-zlib
-mkdir $SRC_DIR/build-zlib
-cd $SRC_DIR/build-zlib
-../zlib-$ZLIB_VERSION/configure --prefix=$INSTALL_PREFIX
-make
-make install
-cd $SRC_DIR
+if [ ! -f $BUILD_DIR/build-zlib/.zlib]
+then
+	cd $BUILD_DIR
+	if [ ! -f zlib-$ZLIB_VERSION ]
+	then
+		tar -xzvf $SRC_DIR/zlib-$ZLIB_VERSION.tar.gz
+	fi
+	rm -rf $BUILD_DIR/build-zlib
+	mkdir $BUILD_DIR/build-zlib
+	cd $BUILD_DIR/build-zlib
+	$SRC_DIR/zlib-$ZLIB_VERSION/configure --prefix=$INSTALL_PREFIX
+	make
+	make install
+	touch .zlib
+	cd $SRC_DIR
+fi
 
 # libiconv
 rm -rf libiconv-$LIBICONV_VERSION
@@ -75,7 +82,7 @@ cd $SRC_DIR
 
 # libxml2
 rm -rf libxml2-$LIBXML2_VERSION
-tar -xvf libxml2-$LIBXML2_VERSION.tar.xz
+tar -xvf libxml2-$LIBXML2_VERSION.tar.gz
 cd $SRC_DIR/libxml2-$LIBXML2_VERSION
 ./autogen.sh --prefix=$INSTALL_PREFIX
 make
@@ -182,6 +189,11 @@ rm -rf $LFS/cmake-$CMAKE_VERSION
 mv cmake-$CMAKE_VERSION $LFS/cmake-$CMAKE_VERSION
 rm -rf $LFS/build-cmake
 mkdir $LFS/build-cmake
+
+# Openssl
+rm -rf openssl-$OPENSSL_VERSION
+tar -xzvf openssl-$OPENSSL_VERSION.tar.gz
+rm -rf $LFS/op
 
 # Copy scripts into $LFS
 cp setup.sh $LFS
