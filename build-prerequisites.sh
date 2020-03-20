@@ -17,183 +17,116 @@ export PATH LIBRARY_PATH CPATH
 
 INSTALL_PREFIX=$LFS/usr
 
-# Zlib
-if [ ! -f $BUILD_DIR/build-zlib/.zlib]
-then
-	cd $BUILD_DIR
-	if [ ! -f zlib-$ZLIB_VERSION ]
+function compile() {
+	name=$1
+	version=$2
+	[[ -z "$3" ]] && local_untar="tar -xzvf $SRC_DIR/$name-$version.tar.gz" || local_untar="$3"
+	[[ -z "$4" ]] && local_configure="$SRC_DIR/$name-$version/configure --prefix=$INSTALL_PREFIX" || local_configure="$4"
+	[[ -z "$5" ]] && local_build="make" || local_build="$5"
+	[[ -z "$6" ]] && local_install="sudo make install" || local_install="$6"
+	if [ ! -f $BUILD_DIR/$name/.$name ]
 	then
-		tar -xzvf $SRC_DIR/zlib-$ZLIB_VERSION.tar.gz
+		rm -rf $BUILD_DIR/$name
+		mkdir -p $BUILD_DIR/$name
+		cd $BUILD_DIR/$name
+		if [ ! -d $SRC_DIR/$name-$version ]
+		then
+			echo "Checking: $SRC_DIR/$name-$version"
+			cd $SRC_DIR
+			echo "untaring: $local_untar"
+			$local_untar
+			cd $BUILD_DIR/$name
+		fi
+		echo "Configure: $local_configure"
+		$local_configure
+		echo "Build: $local_build"
+		$local_build
+		echo "Install: $local_install"
+		$local_install
+		cd $BUILD_DIR/$name
+		touch .$name
+		cd $WD
 	fi
-	rm -rf $BUILD_DIR/build-zlib
-	mkdir $BUILD_DIR/build-zlib
-	cd $BUILD_DIR/build-zlib
-	$SRC_DIR/zlib-$ZLIB_VERSION/configure --prefix=$INSTALL_PREFIX
-	make
-	make install
-	touch .zlib
-	cd $SRC_DIR
-fi
+}
+
+# Zlib
+compile "zlib" "$ZLIB_VERSION"
 
 # libiconv
-rm -rf libiconv-$LIBICONV_VERSION
-tar -xzvf libiconv-$LIBICONV_VERSION.tar.gz
-rm -rf $SRC_DIR/build-libiconv
-mkdir $SRC_DIR/build-libiconv
-cd $SRC_DIR/build-libiconv
-../libiconv-$LIBICONV_VERSION/configure --prefix=$INSTALL_PREFIX
-make
-make install
-cd $SRC_DIR
+compile "libiconv" "$LIBICONV_VERSION"
 
 # ncurses
-rm -rf ncurses-$NCURSES_VERSION
-tar -xzvf ncurses-$NCURSES_VERSION.tar.gz
-rm -rf $SRC_DIR/build-ncurses
-mkdir $SRC_DIR/build-ncurses
-cd $SRC_DIR/build-ncurses
-../ncurses-$NCURSES_VERSION/configure \
- --prefix=$INSTALL_PREFIX             \
- --with-shared                        \
- --enable-pc-files
-make
-make install
-cd $SRC_DIR
+compile "ncurses" "$NCURSES_VERSION" "" "$SRC_DIR/ncurses-$NCURSES_VERSION/configure --prefix=$INSTALL_PREFIX --with-shared --enable-pc-files"
 
 # icu4c
-rm -rf icu4c-$ICU4C_VERSION
-tar -xzvf icu4c-$ICU4C_VERSION-src.tgz
-cd icu/source
-./configure --prefix=$INSTALL_PREFIX
-make
-make install
-cd $SRC_DIR
+function icu_untar() {
+	tar -xzvf icu4c-$ICU4C_VERSION-src.tgz
+	mv icu icu4c-$ICU4C_VERSION
+}
+function icu_build() {
+	cp -r $SRC_DIR/icu4c-$ICU4C_VERSION/* .
+	cd source && ./configure --prefix=$INSTALL_PREFIX
+}
+compile "icu4c" "$ICU4C_VERSION" "icu_untar" icu_build ""
 
 # xz
-rm -rf xz-$XZ_VERSION
-tar -xvf xz-$XZ_VERSION.tar.xz
-rm -rf $SRC_DIR/build-xz
-mkdir $SRC_DIR/build-xz
-cd $SRC_DIR/build-xz
-../xz-$XZ_VERSION/configure --prefix=$INSTALL_PREFIX
-make
-make install
-cd $SRC_DIR
+compile "xz" "$XZ_VERSION" "tar -xvf xz-$XZ_VERSION.tar.xz"
 
 # libxml2
-rm -rf libxml2-$LIBXML2_VERSION
-tar -xvf libxml2-$LIBXML2_VERSION.tar.gz
-cd $SRC_DIR/libxml2-$LIBXML2_VERSION
-./autogen.sh --prefix=$INSTALL_PREFIX
-make
-make install
-cd $SRC_DIR
+compile "libxml2" "$LIBXML2_VERSION" "" "$SRC_DIR/libxml2-$LIBXML2_VERSION/autogen.sh"
 
 # libuuid
-rm -rf libuuid-$LIBUUID_VERSION
-tar -xzvf libuuid-$LIBUUID_VERSION.tar.gz
-rm -rf $SRC_DIR/build-libuuid
-mkdir $SRC_DIR/build-libuuid
-cd $SRC_DIR/build-libuuid
-../libuuid-$LIBUUID_VERSION/configure --prefix=$INSTALL_PREFIX
-make
-make install
-cd $SRC_DIR
+compile "libuuid" "$LIBUUID_VERSION"
 
 # bash
-rm -rf bash-$BASH_VERSION
-tar -xzvf bash-$BASH_VERSION.tar.gz
-rm -rf $SRC_DIR/build-bash
-mkdir $SRC_DIR/build-bash
-cd $SRC_DIR/build-bash
-../bash-$BASH_VERSION/configure --prefix=$INSTALL_PREFIX
-make
-make install
-cd $SRC_DIR
+compile "bash" "$BASH_VERSION"
 
 # coreutils
-rm -rf coreutils-$COREUTILS_VERSION
-tar -xvf coreutils-$COREUTILS_VERSION.tar.xz
-rm -rf $SRC_DIR/build-coreutils
-mkdir $SRC_DIR/build-coreutils
-cd $SRC_DIR/build-coreutils
-FORCE_UNSAFE_CONFIGURE=1 ../coreutils-$COREUTILS_VERSION/configure --prefix=$INSTALL_PREFIX
-make
-make install
-cd $SRC_DIR
+function coreutils_configure() {
+	FORCE_UNSAFE_CONFIGURE=1 $SRC_DIR/coreutils-$COREUTILS_VERSION/configure --prefix=$INSTALL_PREFIX
+}
+compile "coreutils" "$COREUTILS_VERSION" "tar -xvf coreutils-$COREUTILS_VERSION.tar.xz" coreutils_configure
 
 # sed
-rm -rf sed-$SED_VERSION
-tar -xvf sed-$SED_VERSION.tar.bz2
-rm -rf $SRC_DIR/build-sed
-mkdir $SRC_DIR/build-sed
-cd $SRC_DIR/build-sed
-../sed-$SED_VERSION/configure --prefix=$INSTALL_PREFIX
-make
-make install
-cd $SRC_DIR
+compile "sed" "$SED_VERSION" "tar -xvf sed-$SED_VERSION.tar.bz2"
 
 # grep
-rm -rf grep-$GREP_VERSION
-tar -xvf grep-$GREP_VERSION.tar.xz
-rm -rf $SRC_DIR/build-grep
-mkdir $SRC_DIR/build-grep
-cd $SRC_DIR/build-grep
-../grep-$GREP_VERSION/configure --prefix=$INSTALL_PREFIX
-make
-make install
-cd $SRC_DIR
+compile "grep" "$GREP_VERSION" "tar -xvf grep-$GREP_VERSION.tar.xz"
 
 # gawk
-rm -rf gawk-$GAWK_VERSION
-tar -xvf gawk-$GAWK_VERSION.tar.xz
-rm -rf $SRC_DIR/build-gawk
-mkdir $SRC_DIR/build-gawk
-cd $SRC_DIR/build-gawk
-../gawk-$GAWK_VERSION/configure --prefix=$INSTALL_PREFIX
-make
-make install
-cd $SRC_DIR
+compile "gawk" "$GAWK_VERSION" "tar -xvf gawk-$GAWK_VERSION.tar.xz"
 
 # GNU make
-rm -rf make-$MAKE_VERSION
-tar -xvf make-$MAKE_VERSION.tar.bz2
-rm -rf $SRC_DIR/build-make
-mkdir $SRC_DIR/build-make
-cd $SRC_DIR/build-make
-../make-$MAKE_VERSION/configure --prefix=$INSTALL_PREFIX
-make
-make install
-cd $SRC_DIR
+compile "make" "$MAKE_VERSION" "tar -xvf make-$MAKE_VERSION.tar.bz2"
 
 # Python
-rm -rf Python-$PYTHON_VERSION
-tar -xvf Python-$PYTHON_VERSION.tar.xz
-rm -rf $LFS/Python-$PYTHON_VERSION
-mv Python-$PYTHON_VERSION $LFS/Python-$PYTHON_VERSION
-rm -rf $LFS/build-python
-mkdir $LFS/build-python
+#rm -rf Python-$PYTHON_VERSION
+#tar -xvf Python-$PYTHON_VERSION.tar.xz
+#rm -rf $LFS/Python-$PYTHON_VERSION
+#mv Python-$PYTHON_VERSION $LFS/Python-$PYTHON_VERSION
+#rm -rf $LFS/build-python
+#mkdir $LFS/build-python
 
 # ninja
-rm -rf ninja-$NINJA_VERSION
-tar -xvf ninja-$NINJA_VERSION.tar.gz
-rm -rf $LFS/ninja-$NINJA_VERSION
-mv ninja-$NINJA_VERSION $LFS/ninja-$NINJA_VERSION
-rm -rf $LFS/build-ninja
-mkdir $LFS/build-ninja
+#rm -rf ninja-$NINJA_VERSION
+#tar -xvf ninja-$NINJA_VERSION.tar.gz
+#rm -rf $LFS/ninja-$NINJA_VERSION
+#mv ninja-$NINJA_VERSION $LFS/ninja-$NINJA_VERSION
+#rm -rf $LFS/build-ninja
+#mkdir $LFS/build-ninja
 
 # CMake
-rm -rf cmake-$CMAKE_VERSION
-tar -xzvf cmake-$CMAKE_VERSION.tar.gz
-rm -rf $LFS/cmake-$CMAKE_VERSION
-mv cmake-$CMAKE_VERSION $LFS/cmake-$CMAKE_VERSION
-rm -rf $LFS/build-cmake
-mkdir $LFS/build-cmake
+#rm -rf cmake-$CMAKE_VERSION
+#tar -xzvf cmake-$CMAKE_VERSION.tar.gz
+#rm -rf $LFS/cmake-$CMAKE_VERSION
+#mv cmake-$CMAKE_VERSION $LFS/cmake-$CMAKE_VERSION
+#rm -rf $LFS/build-cmake
+#mkdir $LFS/build-cmake
 
 # Openssl
-rm -rf openssl-$OPENSSL_VERSION
-tar -xzvf openssl-$OPENSSL_VERSION.tar.gz
-rm -rf $LFS/op
+#rm -rf openssl-$OPENSSL_VERSION
+#tar -xzvf openssl-$OPENSSL_VERSION.tar.gz
+#rm -rf $LFS/op
 
 # Copy scripts into $LFS
 cp setup.sh $LFS
