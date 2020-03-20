@@ -17,6 +17,13 @@ export PATH LIBRARY_PATH CPATH
 
 INSTALL_PREFIX=$LFS/usr
 
+function check() {
+	if [ ! -f $1 ]
+	then
+		$2
+	fi
+}
+
 function compile() {
 	name=$1
 	version=$2
@@ -24,8 +31,7 @@ function compile() {
 	[[ -z "$4" ]] && local_configure="$SRC_DIR/$name-$version/configure --prefix=$INSTALL_PREFIX" || local_configure="$4"
 	[[ -z "$5" ]] && local_build="make" || local_build="$5"
 	[[ -z "$6" ]] && local_install="sudo make install" || local_install="$6"
-	if [ ! -f $BUILD_DIR/$name/.$name ]
-	then
+	function _compile() {
 		rm -rf $BUILD_DIR/$name
 		mkdir -p $BUILD_DIR/$name
 		cd $BUILD_DIR/$name
@@ -46,7 +52,8 @@ function compile() {
 		cd $BUILD_DIR/$name
 		touch .$name
 		cd $WD
-	fi
+	}
+	check $BUILD_DIR/$name/.$name _compile
 }
 
 # Zlib
