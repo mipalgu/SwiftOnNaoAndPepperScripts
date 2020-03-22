@@ -9,8 +9,8 @@ source setup.sh
 
 function download() {
 	url=$1
-	[[ -z "$2" ]] && filename=`basename $url` || filename="$2"
-	[[ -z "$3" ]] && outname=$filename || outname="$3"
+	[[ -z "$3" ]] && filename=`basename $url` || filename="$3"
+	[[ -z "$2" ]] && outname=$filename || outname="$2"
 	function _download() {
 		PATH="/usr/local/bin:$PATH" LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH" wget $url
 		if [ $filename != $outname ]
@@ -18,6 +18,6 @@ function download() {
 			mv $filename $outname
 		fi
 	}
-	check _download
+	check $outname _download
 }
 fi
