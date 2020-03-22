@@ -7,7 +7,7 @@ SETUP_SH_INCLUDED=yes
 
 WD=`pwd`
 SRC_DIR=$WD
-LFS=/tools
+LFS=/home/nao/tools
 SRC_DIR=$WD/src
 BUILD_DIR=/$WD/build
 
@@ -42,8 +42,10 @@ function compile() {
 		fi
 		echo "Configure: $local_configure"
 		$local_configure
+		cd $BUILD_DIR/$name
 		echo "Build: $local_build"
 		$local_build
+		cd $BUILD_DIR/$name
 		echo "Install: $local_install"
 		$local_install
 		cd $BUILD_DIR/$name
