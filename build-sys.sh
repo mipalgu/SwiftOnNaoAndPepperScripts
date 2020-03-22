@@ -8,22 +8,26 @@ source versions.sh
 # Set Up Environment
 LC_ALL=POSIX
 LFS_TGT=$(uname -m)-lfs-linux-gnu
-PATH=/$LFS/bin:/bin:/usr/bin
+PATH=$LFS/usr/bin:$LFS/bin:/usr/bin:/bin
 export LFS LC_ALL LFS_TGT PATH
 
 # Set Up Folders
-sudo rm -rf $LFS
-mkdir -p $LFS/$LFS
-mkdir -p $LFS/include
-sudo rm -r $LFS/$LFS
-ln -s $LFS $LFS/$LFS
+function setup_folders() {
+	sudo rm -rf $LFS
+	mkdir -p $LFS/$LFS
+	mkdir -p $LFS/include
+	sudo rm -r $LFS/$LFS
+	ln -s $LFS $LFS/$LFS
+}
+check $BUILD_DIR/.lfs setup_folders
 
 # Build the system.
 # binutils - FirstPass
 function binutils1() {
 	function binutils_configure1() {
-		$SRC_DIR/binutils-$BINUTILS_VERSION/configure --prefix=$LFS --with-sysroot=$LFS --with-lib-path=$LFS/lib --target=$LFS_TGT --disable-nls --disable-werror
+		$SRC_DIR/binutils-$BINUTILS_VERSION/configure --prefix=$LFS/usr --with-sysroot=$LFS --with-lib-path=$LFS/lib --target=$LFS_TGT --disable-nls --disable-werror
 	}
+	rm -rf $BUILD_DIR/binutils
 	compile "binutils" "$BINUTILS_VERSION" "" binutils_configure1
 }
 check $BUILD_DIR/.binutils1 binutils1
@@ -39,12 +43,12 @@ function gcc1() {
 		 $(find gcc/config -name linux64.h -o -name linux.h -o -name sysv4.h)
 		do
 		 cp -uv $file{,.orig}
-		 sed -e "s@/lib\\(64\\)\\?\\(32\\)\\?/ld@$LFS&@g" \
+		 sed -e "s@/lib\\(64\\)\\?\\(32\\)\\?/ld@$LFS/usr&@g" \
 		 -e 's@/usr@/tools@g' $file.orig > $file
 		 echo "
 		#undef STANDARD_STARTFILE_PREFIX_1
 		#undef STANDARD_STARTFILE_PREFIX_2
-		#define STANDARD_STARTFILE_PREFIX_1 \"$LFS/lib/\"
+		#define STANDARD_STARTFILE_PREFIX_1 \"$LFS/usr/lib/\"
 		#define STANDARD_STARTFILE_PREFIX_2 \"\"" >> $file
 		 touch $file.orig
 		done
@@ -55,7 +59,7 @@ function gcc1() {
 	function gcc_configure() {
 		$SRC_DIR/gcc-$GCC_VERSION/configure \
 			--target=$LFS_TGT \
-			--prefix=$LFS \
+			--prefix=$LFS/usr \
 			--with-sysroot=$LFS \
 			--with-newlib \
 			--without-headers \
@@ -77,6 +81,7 @@ function gcc1() {
 			--disable-libstdc++-v3 \
 			--enable-languages=c,c++
 	}
+	rm -rf $BUILD_DIR/gcc
 	compile "gcc" "$GCC_VERSION" gcc_untar gcc_configure
 }
 check $BUILD_DIR/.gcc1 gcc1
@@ -93,7 +98,6 @@ function linux() {
 		sudo make INSTALL_HDR_PATH=dest headers_install
 		sudo cp -rv dest/include/* $LFS/include
 	}
-	echo "in linux"
 	compile "linux" "$LINUX_VERSION" "tar -xvf linux-$LINUX_VERSION.tar.xz" linux_configure linux_build linux_install
 }
 check "$BUILD_DIR/.linux" linux
@@ -105,7 +109,7 @@ function glibc() {
 		AR=$LFS_TGT-ar \
 		RANLIB=$LFS_TGT-ranlib \
 		$SRC_DIR/glibc-$GLIBC_VERSION/configure \
-			--prefix=$LFS \
+			--prefix=$LFS/usr \
 			--host=$LFS_TGT \
 			--build=$(../glibc-$GLIBC_VERSION/scripts/config.guess) \
 			--disable-profile \
@@ -122,12 +126,12 @@ check $BUILD_DIR/.glibc glibc
 # Libstdc++
 function libstdcpp() {
 	function libstdcpp_untar() {
-		mkdir -p $BUILD_DIR/libstdc++-$GCC_VERSION
+		mkdir -p $SRC_DIR/libstdc++-$GCC_VERSION
 	}
 	function libstdcpp_configure() {
 		$SRC_DIR/gcc-$GCC_VERSION/libstdc++-v3/configure \
 			--host=$LFS_TGT \
-			--prefix=$LFS \
+			--prefix=$LFS/usr \
 			--disable-multilib \
 			--disable-shared \
 			--disable-nls \
@@ -141,13 +145,12 @@ check $BUILD_DIR/.libstdcpp libstdcpp
 
 # binutils - Second Pass
 function binutils2() {
-	rm -rf $BUILD_DIR/binutils-$BINUTILS_VERSION
 	function binutils_configure2() {
 		CC=$LFS_TGT-gcc \
 		AR=$LFS_TGT-ar \
 		RANLIB=$LFS_TGT-ranlib \
 		$SRC_DIR/binutils-$BINUTILS_VERSION/configure \
-			--prefix=$LFS \
+			--prefix=$LFS/usr \
 			--disable-nls \
 			--disable-werror \
 			--with-lib-path=$LFS/lib \
@@ -159,6 +162,7 @@ function binutils2() {
 		make -C ld LIB_PATH=/usr/lib:/lib
 		cp -v ld/ld-new $LFS/bin
 	}
+	rm -rf $BUILD_DIR/binutils-$BINUTILS_VERSION
 	compile "binutils" "$BINUTILS_VERSION" "" binutils_configure2 "" binutils_install2
 }
 check $BUILD_DIR/.binutils2 binutils2
@@ -174,12 +178,12 @@ function gcc2() {
 		 $(find gcc/config -name linux64.h -o -name linux.h -o -name sysv4.h)
 		do
 		 cp -uv $file{,.orig}
-		 sed -e "s@/lib\\(64\\)\\?\\(32\\)\\?/ld@$LFS&@g" \
+		 sed -e "s@/lib\\(64\\)\\?\\(32\\)\\?/ld@$LFS/usr&@g" \
 		 -e 's@/usr@/tools@g' $file.orig > $file
 		 echo "
 		#undef STANDARD_STARTFILE_PREFIX_1
 		#undef STANDARD_STARTFILE_PREFIX_2
-		#define STANDARD_STARTFILE_PREFIX_1 \"$LFS/lib\"
+		#define STANDARD_STARTFILE_PREFIX_1 \"$LFS/usr/lib\"
 		#define STANDARD_STARTFILE_PREFIX_2 \"\"" >> $file
 		 touch $file.orig
 		done
@@ -189,7 +193,7 @@ function gcc2() {
 	}
 	function gcc_configure2() {
 		$SRC_DIR/gcc-$GCC_VERSION/configure \
-		 --prefix=$LFS \
+		 --prefix=$LFS/usr \
 		 --with-local-prefix=$LFS \
 		 --with-native-system-header-dir=$LFS/include \
 		 --enable-languages=c,c++ \
@@ -211,7 +215,7 @@ function gcc2() {
 		AR=$LFS_TGT-ar \
 		RANLIB=$LFS_TGT-ranlib \
 		make install
-		ln -sv gcc $LFS/bin/cc
+		ln -sv gcc $LFS/usr/bin/cc
 	}
 	rm -rf $SRC_DIR/gcc-$GCC_VERSION
 	compile "gcc" "$GCC_VERSION" gcc_untar2 gcc_configure2 gcc_build2 gcc_install2
