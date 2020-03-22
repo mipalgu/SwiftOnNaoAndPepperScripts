@@ -18,8 +18,8 @@ download http://download.icu-project.org/files/icu4c/$ICU4C_MAJOR_VERSION.$ICU4C
 download https://ftp.gnu.org/gnu/libiconv/libiconv-$LIBICONV_VERSION.tar.gz
 
 download https://tukaani.org/xz/xz-$XZ_VERSION.tar.xz
-download https://git.gnome.org/browse/libxml2/tag/?h=v$LIBXML2_VERSION
-download https://sourceforge.net/projects/libuuid/files/libuuid-$LIBUUID_VERSION.tar.gz/download
+download ftp://xmlsoft.org/libxml2/libxml2-$LIBXML2_VERSION.tar.gz
+download https://sourceforge.net/projects/libuuid/files/libuuid-$LIBUUID_VERSION.tar.gz/download libuuid-$LIBUUID_VERSION.tar.gz
 
 download https://ftp.gnu.org/gnu/bash/bash-${BASH_VERSION}.tar.gz
 download https://ftp.gnu.org/gnu/coreutils/coreutils-${COREUTILS_VERSION}.tar.xz
