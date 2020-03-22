@@ -17,45 +17,6 @@ export PATH LIBRARY_PATH CPATH
 
 INSTALL_PREFIX=$LFS/usr
 
-function check() {
-	if [ ! -f $1 ]
-	then
-		$2
-	fi
-}
-
-function compile() {
-	name=$1
-	version=$2
-	[[ -z "$3" ]] && local_untar="tar -xzvf $SRC_DIR/$name-$version.tar.gz" || local_untar="$3"
-	[[ -z "$4" ]] && local_configure="$SRC_DIR/$name-$version/configure --prefix=$INSTALL_PREFIX" || local_configure="$4"
-	[[ -z "$5" ]] && local_build="make" || local_build="$5"
-	[[ -z "$6" ]] && local_install="sudo make install" || local_install="$6"
-	function _compile() {
-		rm -rf $BUILD_DIR/$name
-		mkdir -p $BUILD_DIR/$name
-		cd $BUILD_DIR/$name
-		if [ ! -d $SRC_DIR/$name-$version ]
-		then
-			echo "Checking: $SRC_DIR/$name-$version"
-			cd $SRC_DIR
-			echo "untaring: $local_untar"
-			$local_untar
-			cd $BUILD_DIR/$name
-		fi
-		echo "Configure: $local_configure"
-		$local_configure
-		echo "Build: $local_build"
-		$local_build
-		echo "Install: $local_install"
-		$local_install
-		cd $BUILD_DIR/$name
-		touch .$name
-		cd $WD
-	}
-	check $BUILD_DIR/$name/.$name _compile
-}
-
 # Zlib
 compile "zlib" "$ZLIB_VERSION"
 
@@ -74,7 +35,7 @@ function icu_build() {
 	cp -r $SRC_DIR/icu4c-$ICU4C_VERSION/* .
 	cd source && ./configure --prefix=$INSTALL_PREFIX
 }
-compile "icu4c" "$ICU4C_VERSION" "icu_untar" icu_build ""
+compile "icu4c" "$ICU4C_VERSION" icu_untar icu_build
 
 # xz
 compile "xz" "$XZ_VERSION" "tar -xvf xz-$XZ_VERSION.tar.xz"
