@@ -12,9 +12,10 @@ PATH=/$LFS/bin:/bin:/usr/bin
 export LFS LC_ALL LFS_TGT PATH
 
 # Set Up Folders
-rm -rf $LFS
+sudo rm -rf $LFS
 mkdir -p $LFS/$LFS
-rm -r $LFS/$LFS
+mkdir -p $LFS/include
+sudo rm -r $LFS/$LFS
 ln -s $LFS $LFS/$LFS
 
 # Build the system.
@@ -83,22 +84,26 @@ check $BUILD_DIR/.gcc1 gcc1
 # Linux
 function linux() {
 	function linux_configure() {
-		echo "skip"
+		cp -R $SRC_DIR/linux-$LINUX_VERSION/* .
 	}
 	function linux_build() {
 		make mrproper
 	}
 	function linux_install() {
-		make INSTALL_HDR_PATH=dest headers_install
-		cp -rv dest/include/* $LFS/include
+		sudo make INSTALL_HDR_PATH=dest headers_install
+		sudo cp -rv dest/include/* $LFS/include
 	}
-	compile "linux" "$LINUX_VERISON" "tar -xvf linux-$LINUX_VERSION.tar.xz" linux_configure linux_build linux_install
+	echo "in linux"
+	compile "linux" "$LINUX_VERSION" "tar -xvf linux-$LINUX_VERSION.tar.xz" linux_configure linux_build linux_install
 }
-check $BUILD_DIR/.linux linux
+check "$BUILD_DIR/.linux" linux
 
 # Glibc
 function glibc() {
 	glibc_configure() {
+		CC=$LFS_TGT-gcc \
+		AR=$LFS_TGT-ar \
+		RANLIB=$LFS_TGT-ranlib \
 		$SRC_DIR/glibc-$GLIBC_VERSION/configure \
 			--prefix=$LFS \
 			--host=$LFS_TGT \
@@ -159,49 +164,56 @@ function binutils2() {
 check $BUILD_DIR/.binutils2 binutils2
 
 # GCC - Second Pass
-rm -rf $SRC_DIR/gcc-$GCC_VERSION
-function gcc_untar2() {
+function gcc2() {
+	function gcc_untar2() {
+		tar -xvf gcc-$GCC_VERSION.tar.gz
+		cd $SRC_DIR/gcc-$GCC_VERSION
+		cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
+		 `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include-fixed/limits.h
+		for file in \
+		 $(find gcc/config -name linux64.h -o -name linux.h -o -name sysv4.h)
+		do
+		 cp -uv $file{,.orig}
+		 sed -e 's@/lib\(64\)\?\(32\)\?/ld@/tools&@g' \
+		 -e 's@/usr@/tools@g' $file.orig > $file
+		 echo '
+		#undef STANDARD_STARTFILE_PREFIX_1
+		#undef STANDARD_STARTFILE_PREFIX_2
+		#define STANDARD_STARTFILE_PREFIX_1 "/tools/lib/"
+		#define STANDARD_STARTFILE_PREFIX_2 ""' >> $file
+		 touch $file.orig
+		done
+		./contrib/download_prerequisites
+		sed -i 's/if \((code.*))\)/if (\1 \&\& \!DEBUG_INSN_P (insn))/' gcc/sched-deps.c
+		cd $SRC_DIR
+	}
+	function gcc_configure2() {
+		$SRC_DIR/gcc-$GCC_VERSION/configure \
+		 --prefix=$LFS \
+		 --with-local-prefix=$LFS \
+		 --with-native-system-header-dir=$LFS/include \
+		 --enable-languages=c,c++ \
+		 --disable-libstdcxx-pch \
+		 --disable-multilib \
+		 --disable-bootstrap \
+		 --disable-libgomp
+	}
+	function gcc_build2() {
+		CC=$LFS_TGT-gcc \
+		CXX=$LFS_TGT-g++ \
+		AR=$LFS_TGT-ar \
+		RANLIB=$LFS_TGT-ranlib \
+		make
+	}
+	function gcc_install2() {
+		CC=$LFS_TGT-gcc \
+		CXX=$LFS_TGT-g++ \
+		AR=$LFS_TGT-ar \
+		RANLIB=$LFS_TGT-ranlib \
+		make install
+		ln -sv gcc $LFS/bin/cc
+	}
+	rm -rf $SRC_DIR/gcc-$GCC_VERSION
+	compile "gcc" "$GCC_VERSION" gcc_untar2 gcc_configure2 gcc_build2 gcc_install2
 }
-function gcc_configure2() {
-}
-rm -rf gcc-$GCC_VERSION
-tar -xvf gcc-$GCC_VERSION.tar.gz
-cd $SRC_DIR/gcc-$GCC_VERSION
-cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
- `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include-fixed/limits.h
-for file in \
- $(find gcc/config -name linux64.h -o -name linux.h -o -name sysv4.h)
-do
- cp -uv $file{,.orig}
- sed -e 's@/lib\(64\)\?\(32\)\?/ld@/tools&@g' \
- -e 's@/usr@/tools@g' $file.orig > $file
- echo '
-#undef STANDARD_STARTFILE_PREFIX_1
-#undef STANDARD_STARTFILE_PREFIX_2
-#define STANDARD_STARTFILE_PREFIX_1 "/tools/lib/"
-#define STANDARD_STARTFILE_PREFIX_2 ""' >> $file
- touch $file.orig
-done
-./contrib/download_prerequisites
-sed -i 's/if \((code.*))\)/if (\1 \&\& \!DEBUG_INSN_P (insn))/' gcc/sched-deps.c
-cd $SRC_DIR
-rm -rf $SRC_DIR/build-gcc
-mkdir $SRC_DIR/build-gcc
-cd $SRC_DIR/build-gcc
-CC=$LFS_TGT-gcc \
-CXX=$LFS_TGT-g++ \
-AR=$LFS_TGT-ar \
-RANLIB=$LFS_TGT-ranlib \
-../gcc-$GCC_VERSION/configure \
- --prefix=$LFS \
- --with-local-prefix=$LFS \
- --with-native-system-header-dir=$LFS/include \
- --enable-languages=c,c++ \
- --disable-libstdcxx-pch \
- --disable-multilib \
- --disable-bootstrap \
- --disable-libgomp
- make
- make install
- ln -sv gcc $LFS/bin/cc
- cd $SRC_DIR
+check $BUILD_DIR/.gcc2 gcc2

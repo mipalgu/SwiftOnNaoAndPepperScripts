@@ -6,10 +6,9 @@ then
 SETUP_SH_INCLUDED=yes
 
 WD=`pwd`
-SRC_DIR=$WD
 LFS=/home/nao/tools
 SRC_DIR=$WD/src
-BUILD_DIR=/$WD/build
+BUILD_DIR=$WD/build
 
 mkdir -p $SRC_DIR
 mkdir -p $BUILD_DIR
@@ -18,6 +17,7 @@ function check() {
 	if [ ! -f $1 ]
 	then
 		$2
+		touch $1
 	fi
 }
 
@@ -48,8 +48,6 @@ function compile() {
 		cd $BUILD_DIR/$name
 		echo "Install: $local_install"
 		$local_install
-		cd $BUILD_DIR/$name
-		touch .$name
 		cd $WD
 	}
 	check $BUILD_DIR/$name/.$name _compile
