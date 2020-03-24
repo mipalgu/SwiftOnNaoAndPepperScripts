@@ -1,137 +1,82 @@
 #!/usr/bin/env bash
 set -e
 
-source setup.sh
-
-VERSION=swift-4.0.2-RELEASE
-CMAKE_BUILD_TYPE=Release
-SRC_DIR=$WD/src
-INSTALL_PREFIX=$LFS/usr/local
-ARCH=i686
-OS=linux
-TRIPLE=$ARCH-pc-$OS-gnu
-PLATFORM=$ARCH-$OS
-BUILD_DIR=$SRC_DIR/build
-CMARK_BUILD_DIR=$BUILD_DIR/cmark-$PLATFORM
-LLVM_BUILD_DIR=$BUILD_DIR/llvm-$PLATFORM
-SWIFT_BUILD_DIR=$BUILD_DIR/swift-$PLATFORM/ninja
-PYTHONPATH="$SRC_DIR/swift/utils"
-GCC=$LFS/bin/gcc
-GXX=$LFS/bin/g++
-CLANG=$LLVM_BUILD_DIR/bin/clang
-CLANGXX=$LLVM_BUILD_DIR/bin/clang++
-PATH="$LFS/usr/local/bin:$LFS/usr/bin:/usr/local/bin:/usr/bin:/bin"
-LIBRARY_PATH="$LFS/usr/local/lib:$LFS/usr/lib:$LFS/lib"
-CPATH="$LFS/usr/local/include:$LFS/usr/include:$LFS/include"
-export PATH LIBRARY_PATH CPATH
-
-#rm -rf $SRC_DIR
-#mkdir -p $SRC_DIR
-cd $SRC_DIR
-#tar -xzvf $WD/apple.tar.gz
-cd llvm/tools
-rm clang
-rm compiler-rt
-ln -s $SRC_DIR/clang .
-ln -s $SRC_DIR/compiler-rt .
-
-rm -rf $BUILD_DIR
-
-echo "Compiling cmark."
-mkdir -p $CMARK_BUILD_DIR
-cd $CMARK_BUILD_DIR && cmake -G "Ninja" \
-  -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
-  -DCMAKE_C_COMPILER="$GCC" \
-  -DCMAKE_CXX_COMPILER="$GXX" \
-  $SRC_DIR/cmark
-cd $SRC_DIR
-cmake --build $CMARK_BUILD_DIR
-
-echo "Compiling LLVM with clang and compiler-rt."
-mkdir -p $LLVM_BUILD_DIR
-cd $LLVM_BUILD_DIR
-cmake -G "Ninja" \
-  -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
-  -DLLVM_ENABLE_ASSERTIONS=TRUE \
-  -DCMAKE_C_COMPILER="$GCC" \
-  -DCMAKE_CXX_COMPILER="$GXX" \
-  -DCMAKE_ASM_COMPILER="$GCC" \
-  -DCMAKE_C_FLAGS="-fno-stack-protector" \
-  -DCMAKE_CXX_FLAGS="-fpermissive" \
-  -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
-  -DLLVM_TOOL_SWIFT_BUILD=NO \
-  -DLLVM_INCLUDE_DOCS=TRUE \
-  -DLLVM_TOOL_COMPILER_RT_BUILD=TRUE \
-  -DLLVM_BUILD_EXTERNAL_COMPILER_RT=TRUE \
-  -DLLVM_LIT_ARGS=-sv \
-  $SRC_DIR/llvm
-LD_LIBRARY_PATH="$LFS/usr/local/lib" ninja -j4
-cd $SRC_DIR
-#cmake --build $LLVM_BUILD_DIR
-
-echo "Patching swift files so that they work with 32 bit."
-sed -i 's/#if defined(__linux__) \&\& defined (__arm__)/#if defined(__linux__) \&\& (defined (__arm__) \|\| defined(__i386__))/' $SRC_DIR/swift/stdlib/public/SwiftShims/LibcShims.h
-#sed -i 's/return RetTy{ llvm::Type::getX86_FP80Ty(ctx), Size(16), Alignment(16) };/return RetTy{ llvm::Type::getX86_FP80Ty(ctx), Size(12), Alignment(16) };/' $SRC_DIR/swift/lib/IRGen/GenType.cpp
-
-echo "Compiling swift."
-mkdir -p $SWIFT_BUILD_DIR
-cd $SWIFT_BUILD_DIR
-cmake -G "Ninja" \
-  -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
-  -DCMAKE_C_COMPILER="$CLANG" \
-  -DCMAKE_CXX_COMPILER="$CLANGXX" \
-  -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
-  -DSWIFT_PATH_TO_CMARK_SOURCE="$SRC_DIR/cmark" \
-  -DSWIFT_PATH_TO_CMARK_BUILD="$CMARK_BUILD_DIR" \
-  -DSWIFT_CMARK_LIBRARY_DIR="$CMARK_BUILD_DIR/src" \
-  -DSWIFT_PATH_TO_LLVM_SOURCE="$SRC_DIR/llvm" \
-  -DSWIFT_PATH_TO_LLVM_BUILD="$LLVM_BUILD_DIR" \
-  -DSWIFT_PATH_TO_CLANG_SOURCE="$SRC_DIR/clang" \
-  -DSWIFT_PATH_TO_CLANG_BUILD="$LLVM_BUILD_DIR" \
-  -DSWIFT_INCLUDE_DOCS=FALSE \
-  -DSWIFT_INCLUDE_TESTS=TRUE \
-  -DSWIFT_BUILD_PERF_TESTSUITE=TRUE \
-  -DSWIFT_BUILD_DYNAMIC_SDK_OVERLAY=TRUE \
-  -DSWIFT_BUILD_RUNTIME_WITH_HOST_COMPILER=FALSE \
-  -DSWIFT_STDLIB_BUILD_TYPE=$CMAKE_BUILD_TYPE \
-  -DSWIFT_SOURCE_DIR="$SRC_DIR/swift" \
-  -DSWIFT_HOST_VARIANT="linux" \
-  -DSWIFT_HOST_VARIANT_SDK="LINUX" \
-  -DSWIFT_HOST_VARIANT_ARCH="$ARCH" \
-  -DSWIFT_HOST_TRIPLE="$TRIPLE" \
-  $SRC_DIR/swift
-LD_LIBRARY_PATH="$LFS/usr/local/lib" ninja -j4
-cd $SRC_DIR
-#cmake --build $SWIFT_BUILD_DIR
+source build-config.sh
 
 cd $WD
-echo "Installing..."
-mkdir -p $INSTALL_PREFIX
-cd $CMARK_BUILD_DIR && ninja install
-cd $LLVM_BUILD_DIR && ninja install
-cd $SWIFT_BUILD_DIR && ninja install
-
-echo "Compiling LLVM with clang and compiler-rt."
-mkdir -p $LLVM_BUILD_DIR
-cd $LLVM_BUILD_DIR
-cmake -G "Ninja" \
-  -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
-  -DLLVM_ENABLE_ASSERTIONS=TRUE \
-  -DCMAKE_C_COMPILER="$GCC" \
-  -DCMAKE_CXX_COMPILER="$GXX" \
-  -DCMAKE_ASM_COMPILER="$GCC" \
-  -DCMAKE_C_FLAGS="-fno-stack-protector" \
-  -DCMAKE_CXX_FLAGS="-fpermissive" \
-  -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
-  -DLLVM_TOOL_SWIFT_BUILD=NO \
-  -DLLVM_INCLUDE_DOCS=TRUE \
-  -DLLVM_TOOL_COMPILER_RT_BUILD=TRUE \
-  -DLLVM_BUILD_EXTERNAL_COMPILER_RT=TRUE \
-  -DCLANG_DEFAULT_RTLIB="compiler-rt" \
-  -DLLVM_LIT_ARGS=-sv \
-  $SRC_DIR/llvm
-LD_LIBRARY_PATH="$LFS/usr/local/lib" ninja -j4
+source cross.sh
 cd $SRC_DIR
-#cmake --build $LLVM_BUILD_DIR
-cd $LLVM_BUILD_DIR && ninja install
+
+if [ ! -f $SWIFT_BUILD_DIR/.swift-build-cross ]
+then
+    echo "Compiling swift."
+    rm -rf $SWIFT_BUILD_DIR
+    mkdir -p $SWIFT_BUILD_DIR
+    cd $SWIFT_BUILD_DIR
+    PATH="$CROSS_DIR/bin:$PATH" CC="$HOST_CLANG" CXX="$HOST_CLANGXX" CPATH="$CPATH" LIBRARY_PATH="$LIBRARY_PATH" cmake -G "Ninja" \
+      -DCMAKE_PREFIX_PATH="$PREFIX_PATH" \
+      -DCMAKE_CROSSCOMPILING=TRUE \
+      -DCMAKE_SYSROOT="$LFS" \
+      -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
+      -DCMAKE_C_COMPILER="$HOST_CLANG" \
+      -DCMAKE_CXX_COMPILER="$HOST_CLANGXX" \
+      -DCMAKE_ASM_COMPILER="$HOST_CLANG" \
+      -DPYTHON_EXECUTABLE="${PYTHON}" \
+      -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+      -DSWIFT_PATH_TO_CMARK_SOURCE="$SRC_DIR/cmark" \
+      -DSWIFT_PATH_TO_CMARK_BUILD="$CMARK_BUILD_DIR" \
+      -DSWIFT_CMARK_LIBRARY_DIR="$CMARK_BUILD_DIR/src" \
+      -DSWIFT_PATH_TO_LLVM_SOURCE="$SRC_DIR/llvm" \
+      -DSWIFT_PATH_TO_LLVM_BUILD="$LLVM_BUILD_DIR" \
+      -DSWIFT_PATH_TO_CLANG_SOURCE="$SRC_DIR/clang" \
+      -DSWIFT_PATH_TO_CLANG_BUILD="$LLVM_BUILD_DIR" \
+      -DSWIFT_INCLUDE_DOCS=FALSE \
+      -DSWIFT_INCLUDE_TESTS=TRUE \
+      -DSWIFT_BUILD_PERF_TESTSUITE=FALSE \
+      -DSWIFT_BUILD_DYNAMIC_SDK_OVERLAY=TRUE \
+      -DSWIFT_BUILD_RUNTIME_WITH_HOST_COMPILER=TRUE \
+      -DSWIFT_STDLIB_BUILD_TYPE=$CMAKE_BUILD_TYPE \
+      -DSWIFT_SOURCE_DIR="$SRC_DIR/swift" \
+      -DSWIFT_HOST_VARIANT="linux" \
+      -DSWIFT_HOST_VARIANT_SDK="LINUX" \
+      -DSWIFT_HOST_VARIANT_ARCH="$ARCH" \
+      -DSWIFT_HOST_TRIPLE="$TRIPLE" \
+      -DSWIFT_PRIMARY_VARIANT="linux" \
+      -DSWIFT_PRIMARY_VARIANT_SDK="LINUX" \
+      -DSWIFT_PRIMARY_VARIANT_ARCH="$ARCH" \
+      -DSWIFT_PRIMARY_VARIANT_TRIPLE="$TRIPLE" \
+      -DCMAKE_C_FLAGS="-gcc-toolchain $CROSS_DIR -Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS -I$CROSS_DIR/$TRIPLE/include/c++/$GCC_VERSION -I$CROSS_DIR/$TRIPLE/include/c++/$GCC_VERSION/$TRIPLE" \
+      -DCMAKE_CXX_FLAGS="-gcc-toolchain $CROSS_DIR -Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS -I$CROSS_DIR/$TRIPLE/include/c++/$GCC_VERSION -I$CROSS_DIR/$TRIPLE/include/c++/$GCC_VERSION/$TRIPLE" \
+      -DCMAKE_EXE_LINKER_FLAGS="$LINK_FLAGS -gcc-toolchain $CROSS_DIR -fno-use-cxa-atexit -luuid -lpthread -fvisibility=protected -Bsymbolic" \
+      -DCMAKE_SHARED_LINKER_FLAGS="$LINK_FLAGS -gcc-toolchain $CROSS_DIR -fno-use-cxa-atexit -luuid -lpthread -fvisibility=protected -Bsymbolic" \
+      -DSWIFT_ENABLE_GOLD_LINKER=TRUE \
+      -DSWIFT_ENABLE_LLD_LINKER=FALSE \
+      -DSWIFT_NATIVE_SWIFT_TOOLS_PATH="/usr/local/var/swiftenv/shims" \
+      -DLLVM_TABLEGEN_EXE=$LLVM_TABLEGEN \
+      -DSWIFT_STDLIB_BUILD_TYPE="MinSizeRel" \
+      -DSWIFT_SDK_LINUX_ARCH_${ARCH}_PATH="$LFS" \
+      -DSWIFT_LINUX_${ARCH}_ICU_UC="$INSTALL_PREFIX/lib/libicuuc.so" \
+      -DSWIFT_LINUX_${ARCH}_ICU_UC_INCLUDE="$INSTALL_PREFIX/include" \
+      -DSWIFT_LINUX_${ARCH}_ICU_I18N="$INSTALL_PREFIX/lib/libicui18n.so" \
+      -DSWIFT_LINUX_${ARCH}_ICU_I18N_INCLUDE="$INSTALL_PREFIX/include" \
+      -DLIBXML2_INCLUDE_DIR="$CROSS_DIR/xml2/include/libxml2" \
+      -DLIBXML2_LIBRARY="$CROSS_DIR/xml2/lib/libxml2.so" \
+      -DLLVM_DIR="$LLVM_BUILD_DIR/lib/cmake/llvm" \
+      -DClang_DIR="$LLVM_BUILD_DIR/lib/cmake/clang" \
+      -DSWIFT_INCLUDE_TOOLS=FALSE \
+      $SRC_DIR/swift
+    cd $SRC_DIR
+    cmake --build $SWIFT_BUILD_DIR -- -j${PARALLEL}
+    touch $SWIFT_BUILD_DIR/lib/swift/linux/i686/StdlibUnicodeUnittest.swiftmodule
+    touch $SWIFT_BUILD_DIR/lib/swift/linux/i686/StdlibUnicodeUnittest.swiftdoc
+    touch $SWIFT_BUILD_DIR/lib/swift/linux/i686/StdlibUnicodeUnittest.swiftinterface
+    touch $SWIFT_BUILD_DIR/lib/swift/linux/libswiftStdlibUnicodeUnittest.so
+    touch $SWIFT_BUILD_DIR/lib/swift/linux/i686/StdlibCollectionUnittest.swiftmodule
+    touch $SWIFT_BUILD_DIR/lib/swift/linux/i686/StdlibCollectionUnittest.swiftdoc
+    touch $SWIFT_BUILD_DIR/lib/swift/linux/i686/StdlibCollectionUnittest.swiftinterface
+    touch $SWIFT_BUILD_DIR/lib/swift/linux/libswiftStdlibCollectionUnittest.so
+    cd $SWIFT_BUILD_DIR && ninja install
+    touch $SWIFT_BUILD_DIR/.swift-build-cross
+fi
+
 cd $WD
