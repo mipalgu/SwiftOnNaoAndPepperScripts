@@ -25,7 +25,7 @@ check $BUILD_DIR/.lfs setup_folders
 # binutils - FirstPass
 function binutils1() {
 	function binutils_configure1() {
-		$SRC_DIR/binutils-$BINUTILS_VERSION/configure --prefix=$LFS/usr --with-sysroot=$LFS --with-lib-path=$LFS/lib --target=$LFS_TGT --disable-nls --disable-werror
+		$SRC_DIR/binutils-$BINUTILS_VERSION/configure --prefix=$LFS --with-sysroot=$LFS --with-lib-path=$LFS/lib --target=$LFS_TGT --disable-nls --disable-werror
 	}
 	rm -rf $BUILD_DIR/binutils
 	compile "binutils" "$BINUTILS_VERSION" "" binutils_configure1
@@ -35,35 +35,46 @@ check $BUILD_DIR/.binutils1 binutils1
 # GCC - First Pass
 function gcc1() {
 	function gcc_untar() {
-		tar -xzvf gcc-$GCC_VERSION
+		tar -xzvf gcc-$GCC_VERSION.tar.gz
 		cd gcc-$GCC_VERSION
 		./contrib/download_prerequisites
+		cd $SRC_DIR
+	}
+	function gcc_configure() {
 		cd $SRC_DIR/gcc-$GCC_VERSION
 		for file in \
 		 $(find gcc/config -name linux64.h -o -name linux.h -o -name sysv4.h)
 		do
+		 if [ -f $file.bak ]
+		 then
+		  cp $file.bak $file
+		 else
+		  cp $file $file.bak
+		 fi
+		done
+		for file in \
+		 $(find gcc/config -name linux64.h -o -name linux.h -o -name sysv4.h)
+		do
 		 cp -uv $file{,.orig}
-		 sed -e "s@/lib\\(64\\)\\?\\(32\\)\\?/ld@$LFS/usr&@g" \
-		 -e 's@/usr@/tools@g' $file.orig > $file
+		 sed -e "s@/lib\\(64\\)\?\\(32\\)\?/ld@$LFS&@g" \
+		 -e "s@/usr@$LFS@g" $file.orig > $file
 		 echo "
 		#undef STANDARD_STARTFILE_PREFIX_1
 		#undef STANDARD_STARTFILE_PREFIX_2
-		#define STANDARD_STARTFILE_PREFIX_1 \"$LFS/usr/lib/\"
+		#define STANDARD_STARTFILE_PREFIX_1 \"$LFS/lib/\"
 		#define STANDARD_STARTFILE_PREFIX_2 \"\"" >> $file
 		 touch $file.orig
 		done
 		sed -i '/k prot/agcc_cv_libc_provides_ssp=yes' gcc/configure
 		sed -i 's/if \((code.*))\)/if (\1 \&\& \!DEBUG_INSN_P (insn))/' gcc/sched-deps.c
-		cd $SRC_DIR
-	}
-	function gcc_configure() {
+		cd $BUILD_DIR/gcc
 		$SRC_DIR/gcc-$GCC_VERSION/configure \
 			--target=$LFS_TGT \
-			--prefix=$LFS/usr \
+			--prefix=$LFS \
 			--with-sysroot=$LFS \
 			--with-newlib \
 			--without-headers \
-			--with-local-prefix=$LFS \
+			--with-local-prefix=$LFS/usr/local \
 			--with-native-system-header-dir=$LFS/include \
 			--disable-nls \
 			--disable-shared \
@@ -78,7 +89,7 @@ function gcc1() {
 			--disable-libssp \
 			--disable-libvtv \
 			--disable-libcilkrts \
-			--disable-libstdc++-v3 \
+			--disable-libstdc__-v3 \
 			--enable-languages=c,c++
 	}
 	rm -rf $BUILD_DIR/gcc
@@ -109,7 +120,7 @@ function glibc() {
 		AR=$LFS_TGT-ar \
 		RANLIB=$LFS_TGT-ranlib \
 		$SRC_DIR/glibc-$GLIBC_VERSION/configure \
-			--prefix=$LFS/usr \
+			--prefix=$LFS \
 			--host=$LFS_TGT \
 			--build=$(../glibc-$GLIBC_VERSION/scripts/config.guess) \
 			--disable-profile \
@@ -129,9 +140,12 @@ function libstdcpp() {
 		mkdir -p $SRC_DIR/libstdc++-$GCC_VERSION
 	}
 	function libstdcpp_configure() {
+		CC=$LFS_TGT-gcc \
+		AR=$LFS_TGT-ar \
+		RANLIB=$LFS/bin/$LFS_TGT-ranlib \
 		$SRC_DIR/gcc-$GCC_VERSION/libstdc++-v3/configure \
 			--host=$LFS_TGT \
-			--prefix=$LFS/usr \
+			--prefix=$LFS \
 			--disable-multilib \
 			--disable-shared \
 			--disable-nls \
@@ -148,21 +162,21 @@ function binutils2() {
 	function binutils_configure2() {
 		CC=$LFS_TGT-gcc \
 		AR=$LFS_TGT-ar \
-		RANLIB=$LFS_TGT-ranlib \
+		RANLIB=$LFS/bin/$LFS_TGT-ranlib \
 		$SRC_DIR/binutils-$BINUTILS_VERSION/configure \
-			--prefix=$LFS/usr \
+			--prefix=$LFS \
 			--disable-nls \
 			--disable-werror \
 			--with-lib-path=$LFS/lib \
 			--with-sysroot
 	}
 	function binutils_install2() {
-		make install
+		sudo make install
 		make -C ld clean
 		make -C ld LIB_PATH=/usr/lib:/lib
-		cp -v ld/ld-new $LFS/bin
+		sudo cp -v ld/ld-new $LFS/bin
 	}
-	rm -rf $BUILD_DIR/binutils-$BINUTILS_VERSION
+	rm -rf $BUILD_DIR/binutils
 	compile "binutils" "$BINUTILS_VERSION" "" binutils_configure2 "" binutils_install2
 }
 check $BUILD_DIR/.binutils2 binutils2
@@ -172,29 +186,45 @@ function gcc2() {
 	function gcc_untar2() {
 		tar -xvf gcc-$GCC_VERSION.tar.gz
 		cd $SRC_DIR/gcc-$GCC_VERSION
+		./contrib/download_prerequisites
+		cd $SRC_DIR
+	}
+	function gcc_configure2() {
+		cd $SRC_DIR/gcc-$GCC_VERSION
 		cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
 		 `dirname $($LFS_TGT-gcc -print-libgcc-file-name)`/include-fixed/limits.h
 		for file in \
 		 $(find gcc/config -name linux64.h -o -name linux.h -o -name sysv4.h)
 		do
+		 if [ -f $file.bak ]
+		 then
+		  cp $file.bak $file
+		 else
+		  cp $file $file.bak
+		 fi
+		done
+		for file in \
+		 $(find gcc/config -name linux64.h -o -name linux.h -o -name sysv4.h)
+		do
 		 cp -uv $file{,.orig}
-		 sed -e "s@/lib\\(64\\)\\?\\(32\\)\\?/ld@$LFS/usr&@g" \
-		 -e 's@/usr@/tools@g' $file.orig > $file
+		 sed -e "s@/lib\\(64\\)\?\\(32\\)\?/ld@$LFS&@g" \
+		 -e "s@/usr@/$LFS@g" $file.orig > $file
 		 echo "
 		#undef STANDARD_STARTFILE_PREFIX_1
 		#undef STANDARD_STARTFILE_PREFIX_2
-		#define STANDARD_STARTFILE_PREFIX_1 \"$LFS/usr/lib\"
+		#define STANDARD_STARTFILE_PREFIX_1 \"$LFS/lib/\"
 		#define STANDARD_STARTFILE_PREFIX_2 \"\"" >> $file
 		 touch $file.orig
 		done
-		./contrib/download_prerequisites
 		sed -i 's/if \((code.*))\)/if (\1 \&\& \!DEBUG_INSN_P (insn))/' gcc/sched-deps.c
-		cd $SRC_DIR
-	}
-	function gcc_configure2() {
+		cd $BUILD_DIR/gcc
+		CC=$LFS_TGT-gcc \
+		CXX=$LFS_TGT-g++ \
+		AR=$LFS_TGT-ar \
+		RANLIB=$LFS/bin/$LFS_TGT-ranlib \
 		$SRC_DIR/gcc-$GCC_VERSION/configure \
-		 --prefix=$LFS/usr \
-		 --with-local-prefix=$LFS \
+		 --prefix=$LFS \
+		 --with-local-prefix=$LFS/usr/local \
 		 --with-native-system-header-dir=$LFS/include \
 		 --enable-languages=c,c++ \
 		 --disable-libstdcxx-pch \
@@ -206,18 +236,19 @@ function gcc2() {
 		CC=$LFS_TGT-gcc \
 		CXX=$LFS_TGT-g++ \
 		AR=$LFS_TGT-ar \
-		RANLIB=$LFS_TGT-ranlib \
+		RANLIB=$LFS/bin/$LFS_TGT-ranlib \
 		make
 	}
 	function gcc_install2() {
 		CC=$LFS_TGT-gcc \
 		CXX=$LFS_TGT-g++ \
 		AR=$LFS_TGT-ar \
-		RANLIB=$LFS_TGT-ranlib \
-		make install
-		ln -sv gcc $LFS/usr/bin/cc
+		RANLIB=$LFS/bin/$LFS_TGT-ranlib \
+		sudo make install
+		sudo ln -sv gcc $LFS/bin/cc
 	}
 	rm -rf $SRC_DIR/gcc-$GCC_VERSION
+	rm -rf $BUILD_DIR/gcc
 	compile "gcc" "$GCC_VERSION" gcc_untar2 gcc_configure2 gcc_build2 gcc_install2
 }
 check $BUILD_DIR/.gcc2 gcc2
