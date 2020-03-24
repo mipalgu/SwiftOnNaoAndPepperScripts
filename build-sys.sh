@@ -17,7 +17,8 @@ function setup_folders() {
 	mkdir -p $LFS/$LFS
 	mkdir -p $LFS/include
 	sudo rm -r $LFS/$LFS
-	ln -s $LFS $LFS/$LFS
+	relativePath=`python -c "import os.path; print os.path.relpath('$LFS', '$LFS/$LFS')"`
+	ln -s $relativePath $LFS/$LFS
 }
 check $BUILD_DIR/.lfs setup_folders
 
