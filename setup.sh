@@ -5,6 +5,7 @@ if [ -z "$SETUP_SH_INCLUDED" ]
 then
 SETUP_SH_INCLUDED=yes
 
+source versions.sh
 WD=`pwd`
 LFS=/home/nao/tools
 SRC_DIR=$WD/src
@@ -53,4 +54,32 @@ function compile() {
 	check $BUILD_DIR/$name/.$name _compile
 }
 
-fi
+usage() { echo "Usage: $0 [-j<value>] -l -s <swift-version> -t <swift-tag>"; }
+
+while getopts "j:hls:t:" o; do
+    case "${o}" in
+        h)
+            usage
+            exit 0
+            ;;
+        j)
+            PARALLEL=${OPTARG}
+            ;;
+        l)
+            BUILD_LIBCXX=true
+	        ;;
+        s)
+	        SWIFT_VERSION=swift-${OPTARG}-RELEASE
+	        ;;
+        t)
+	        SWIFT_VERSION=${OPTARG}
+	        ;;
+        *)
+            echo "Invalid argument ${o}"
+            usage 1>&2
+            exit 1
+            ;;
+    esac
+done
+
+fi # End SETUP_SH_INCLUDED

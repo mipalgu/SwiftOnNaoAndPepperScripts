@@ -30,3 +30,5 @@ function wget_configure() {
 	LD_LIBRARY_PATH="$INSTALL_PREFIX/lib" $SRC_DIR/wget-$WGET_VERSION/configure --prefix=$INSTALL_PREFIX --without-libgnutls-prefix=$INSTALL_PREFIX --with-libgnutls-prefix=$INSTALL_PREFIX CFLAGS="-lgnutls" LDFLAGS="-R$INSTALL_PREFIX/lib -L$INSTALL_PREFIX/lib -lgnutls"
 }
 compile "wget" "$WGET_VERSION"
+
+compile "git" "$GIT_VERSION" "tar -xvf git-$GIT_VERSION.tar.xz"
