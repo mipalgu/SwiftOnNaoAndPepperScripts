@@ -31,17 +31,25 @@ function icu_untar() {
 	tar -xzvf icu4c-$ICU4C_VERSION-src.tgz
 	mv icu icu4c-$ICU4C_VERSION
 }
-function icu_build() {
+function icu_configure() {
 	cp -r $SRC_DIR/icu4c-$ICU4C_VERSION/* .
 	cd source && ./configure --prefix=$INSTALL_PREFIX
 }
-compile "icu4c" "$ICU4C_VERSION" icu_untar icu_build
+function icu_build() {
+	cd source
+	make
+}
+function icu_install() {
+	cd source
+	sudo make install
+}
+compile "icu4c" "$ICU4C_VERSION" icu_untar icu_configure icu_build icu_install
 
 # xz
 compile "xz" "$XZ_VERSION" "tar -xvf xz-$XZ_VERSION.tar.xz"
 
 # libxml2
-compile "libxml2" "$LIBXML2_VERSION" "" "$SRC_DIR/libxml2-$LIBXML2_VERSION/autogen.sh"
+compile "libxml2" "$LIBXML2_VERSION"
 
 # libuuid
 compile "libuuid" "$LIBUUID_VERSION"
@@ -102,10 +110,13 @@ cp versions.sh $LFS
 cp build-chroot.sh $LFS
 cp build-swift.sh $LFS
 
-ln -s $LFS/usr/bin/bash $LFS/bin/sh
-mkdir $LFS/dev
-mknod -m 600 $LFS/dev/console c 5 1
-mknod -m 666 $LFS/dev/null c 1 3
-mkdir $LFS/tmp
+function finalise() {
+	sudo ln -s $LFS/usr/bin/bash $LFS/bin/sh
+	sudo mkdir $LFS/dev
+	sudo mknod -m 600 $LFS/dev/console c 5 1
+	sudo mknod -m 666 $LFS/dev/null c 1 3
+	sudo mkdir $LFS/tmp
+}
+check $BUILD_DIR/.finalise finalise
 
 chroot $LFS $LFS/usr/bin/env -i HOME=/root TERM="$TERM" PS1='\u:\w\$ ' PATH="$LFS/usr/local/bin:$LFS/usr/bin:$LFS/bin" CPATH="$LFS/usr/local/include:$LFS/usr/include:/$LFS/include" LIBRARY_PATH="$LFS/usr/local/lib:$LFS/usr/lib:$LFS/lib" LD_LIBRARY_PATH="$LFS/usr/local/lib:$LFS/usr/lib:$LFS/lib" /build-chroot.sh
