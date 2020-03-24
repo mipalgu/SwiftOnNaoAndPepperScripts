@@ -31,4 +31,17 @@ function wget_configure() {
 }
 compile "wget" "$WGET_VERSION"
 
-compile "git" "$GIT_VERSION" "tar -xvf git-$GIT_VERSION.tar.xz"
+download https://curl.haxx.se/download/curl-$CURL_VERSION.tar.gz
+download https://mirrors.edge.kernel.org/pub/software/scm/git/git-$GIT_VERSION.tar.xz
+
+compile "curl" "$CURL_VERSION"
+
+function git_configure() {
+	cp -R $SRC_DIR/git-$GIT_VERSION/* .
+	make configure
+	./configure --prefix=$INSTALL_PREFIX
+}
+function git_build() {
+	make all
+}
+compile "git" "$GIT_VERSION" "tar -xvf git-$GIT_VERSION.tar.xz" git_configure git_build
