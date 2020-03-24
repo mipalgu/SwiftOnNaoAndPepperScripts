@@ -4,7 +4,7 @@ set -e
 source setup.sh
 source versions.sh
 
-INSTALL_PREFIX=/usr/local
+INSTALL_PREFIX=/usr
 
 compile "curl" "$CURL_VERSION"
 
@@ -33,3 +33,9 @@ function ninja_install() {
 	sudo install ninja $INSTALL_PREFIX/bin
 }
 compile "ninja" "$NINJA_VERSION" "" ninja_configure ninja_build ninja_install
+
+function python_untar() {
+	tar -xzvf python-$PYTHON3_VERSION.tar.gz
+	mv cpython-$PYTHON3_VERSION python-$PYTHON3_VERSION
+}
+compile "python" "$PYTHON3_VERSION" python_untar
