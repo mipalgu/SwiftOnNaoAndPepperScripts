@@ -30,18 +30,3 @@ function wget_configure() {
 	LD_LIBRARY_PATH="$INSTALL_PREFIX/lib" $SRC_DIR/wget-$WGET_VERSION/configure --prefix=$INSTALL_PREFIX --without-libgnutls-prefix=$INSTALL_PREFIX --with-libgnutls-prefix=$INSTALL_PREFIX CFLAGS="-lgnutls" LDFLAGS="-R$INSTALL_PREFIX/lib -L$INSTALL_PREFIX/lib -lgnutls"
 }
 compile "wget" "$WGET_VERSION"
-
-download https://curl.haxx.se/download/curl-$CURL_VERSION.tar.gz
-download https://mirrors.edge.kernel.org/pub/software/scm/git/git-$GIT_VERSION.tar.xz
-
-compile "curl" "$CURL_VERSION"
-
-function git_configure() {
-	cp -R $SRC_DIR/git-$GIT_VERSION/* .
-	make configure
-	./configure --prefix=$INSTALL_PREFIX
-}
-function git_build() {
-	make all
-}
-compile "git" "$GIT_VERSION" "tar -xvf git-$GIT_VERSION.tar.xz" git_configure git_build

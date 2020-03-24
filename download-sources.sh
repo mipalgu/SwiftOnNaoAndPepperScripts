@@ -27,5 +27,7 @@ download http://ftp.gnu.org/gnu/make/make-$MAKE_VERSION.tar.bz2
 download http://ftp.gnu.org/gnu/sed/sed-$SED_VERSION.tar.bz2
 download https://ftp.gnu.org/gnu/grep/grep-$GREP_VERSION.tar.xz
 download http://ftp.gnu.org/gnu/gawk/gawk-$GAWK_VERSION.tar.xz
+download https://curl.haxx.se/download/curl-$CURL_VERSION.tar.gz
+download https://mirrors.edge.kernel.org/pub/software/scm/git/git-$GIT_VERSION.tar.xz
 
 cd $WD

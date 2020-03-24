@@ -6,6 +6,18 @@ source versions.sh
 
 INSTALL_PREFIX=/usr/local
 
+compile "curl" "$CURL_VERSION"
+
+function git_configure() {
+	cp -R $SRC_DIR/git-$GIT_VERSION/* .
+	make configure
+	./configure --prefix=$INSTALL_PREFIX
+}
+function git_build() {
+	make all
+}
+compile "git" "$GIT_VERSION" "tar -xvf git-$GIT_VERSION.tar.xz" git_configure git_build
+
 #CMake
 #compile "cmake" "$CMAKE_VERSION"
 
