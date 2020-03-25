@@ -7,6 +7,9 @@ source download.sh
 
 cd $SRC_DIR
 
+download https://cmake.org/files/v$CMAKE_MAJOR_VERSION.$CMAKE_MINOR_VERSION/cmake-$CMAKE_VERSION.tar.gz
+download http://github.com/ninja-build/ninja/archive/v$NINJA_VERSION.tar.gz ninja-$NINJA_VERSION.tar.gz
+
 download https://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_VERSION.tar.gz
 download https://ftp.gnu.org/gnu/gcc/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.gz
 download https://ftp.gnu.org/gnu/glibc/glibc-$GLIBC_VERSION.tar.gz

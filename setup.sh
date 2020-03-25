@@ -59,6 +59,8 @@ function compile() {
 
 usage() { echo "Usage: $0 [-j<value>] -l -s <swift-version> -t <swift-tag>"; }
 
+PARALLEL=1
+
 while getopts "j:hls:t:" o; do
     case "${o}" in
         h)

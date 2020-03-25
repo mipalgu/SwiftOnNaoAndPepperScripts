@@ -36,3 +36,5 @@ then
         cd $SRC_DIR/apple
     fi
 fi
+
+cd $WD

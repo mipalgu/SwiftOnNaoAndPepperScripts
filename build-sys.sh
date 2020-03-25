@@ -17,8 +17,9 @@ function setup_folders() {
 	mkdir -p $LFS/$LFS
 	mkdir -p $LFS/include
 	sudo rm -r $LFS/$LFS
+	filename=`basename $LFS`
 	relativePath=`python -c "import os.path; print os.path.relpath('$LFS', '$LFS/$LFS')"`
-	ln -s $relativePath $LFS/$LFS
+	ln -s $relativePath/$filename $LFS/$LFS
 }
 check $BUILD_DIR/.lfs setup_folders
 
@@ -26,7 +27,7 @@ check $BUILD_DIR/.lfs setup_folders
 # binutils - FirstPass
 function binutils1() {
 	function binutils_configure1() {
-		$SRC_DIR/binutils-$BINUTILS_VERSION/configure --prefix=$LFS --with-sysroot=$LFS --with-lib-path=$LFS/lib --target=$LFS_TGT --disable-nls --disable-werror
+		$SRC_DIR/binutils-$BINUTILS_VERSION/configure --prefix=$LFS --with-sysroot=$LFS --with-lib-path=$LFS/lib --target=$LFS_TGT --disable-nls --disable-werror --enable-gold=yes
 	}
 	rm -rf $BUILD_DIR/binutils
 	compile "binutils" "$BINUTILS_VERSION" "" binutils_configure1
@@ -126,6 +127,7 @@ function glibc() {
 			--build=$(../glibc-$GLIBC_VERSION/scripts/config.guess) \
 			--disable-profile \
 			--enable-kernel=2.6.32 \
+			--enable-obsolete-rpc \
 			--with-headers=$LFS/include \
 			libc_cv_forced_unwind=yes \
 			libc_cv_ctors_header=yes \
