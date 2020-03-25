@@ -38,4 +38,7 @@ function python_untar() {
 	tar -xzvf python-$PYTHON3_VERSION.tar.gz
 	mv cpython-$PYTHON3_VERSION python-$PYTHON3_VERSION
 }
-compile "python" "$PYTHON3_VERSION" python_untar
+function python_configure() {
+	$SRC_DIR/python-$PYTHON2_VERSION/configure --prefix=/usr/local
+}
+compile "python" "$PYTHON2_VERSION" python_untar python_configure

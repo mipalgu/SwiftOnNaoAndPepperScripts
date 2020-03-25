@@ -29,6 +29,6 @@ download https://ftp.gnu.org/gnu/grep/grep-$GREP_VERSION.tar.xz
 download http://ftp.gnu.org/gnu/gawk/gawk-$GAWK_VERSION.tar.xz
 download https://curl.haxx.se/download/curl-$CURL_VERSION.tar.gz
 download https://mirrors.edge.kernel.org/pub/software/scm/git/git-$GIT_VERSION.tar.xz
-download https://github.com/python/cpython/archive/v$PYTHON3_VERSION.tar.gz python-$PYTHON3_VERSION.tar.gz
+download https://github.com/python/cpython/archive/v$PYTHON2_VERSION.tar.gz python-$PYTHON2_VERSION.tar.gz
 
 cd $WD
