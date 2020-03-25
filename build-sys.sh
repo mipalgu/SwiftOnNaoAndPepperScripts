@@ -168,6 +168,7 @@ function binutils2() {
 			--prefix=$LFS \
 			--disable-nls \
 			--disable-werror \
+			--enable-gold=yes \
 			--with-lib-path=$LFS/lib \
 			--with-sysroot
 	}
