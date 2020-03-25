@@ -19,7 +19,10 @@ function git_build() {
 compile "git" "$GIT_VERSION" "tar -xvf git-$GIT_VERSION.tar.xz" git_configure git_build
 
 #CMake
-#compile "cmake" "$CMAKE_VERSION"
+function cmake_configure() {
+	$SRC_DIR/cmake-$CMAKE_VERSION/configure --prefix=/usr/local
+}
+compile "cmake" "$CMAKE_VERSION" "" cmake_configure
 
 #Ninja
 function ninja_configure() {
