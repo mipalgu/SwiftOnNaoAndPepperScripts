@@ -1,20 +1,23 @@
 #!/usr/bin/env bash
 set -e
 
+source setup.sh
 source build-config.sh
 
 cd $WD
-rm -f $SRC_DIR/llvm/tools/compiler-rt
-cd $SRC_DIR
+rm -f $SRC_DIR/apple/llvm/tools/compiler-rt
+cd $SRC_DIR/apple
 cd llvm/tools
 rm -f libcxx
 rm -f libcxxabi
 
 if [ "$BUILD_LIBCXX" = true ]
 then
-    ln -s $SRC_DIR/libcxx .
-    ln -s $SRC_DIR/libcxxabi .
+    ln -s $SRC_DIR/apple/libcxx .
+    ln -s $SRC_DIR/apple/libcxxabi .
 fi
+
+LFS_TGT=$(uname -m)-lfs-linux-gnu
 
 function cmark() {
     echo "Compiling cmark."
@@ -27,14 +30,14 @@ function cmark() {
       -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER \
       -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
       -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
-      -DCMAKE_C_COMPILER="$HOST_CLANG" \
-      -DCMAKE_CXX_COMPILER="$HOST_CLANGXX" \
-      -DCMAKE_C_FLAGS="-gcc-toolchain $LFS $INCLUDE_FLAGS $BINARY_FLAGS" \
-      -DCMAKE_CXX_FLAGS="-gcc-toolchain $LFS $INCLUDE_FLAGS $BINARY_FLAGS" \
-      -DCMAKE_EXE_LINKER_FLAGS="-gcc-toolchain $LFS" \
-      -DCMAKE_SHARED_LINKER_FLAGS="-gcc-toolchain $LFS" \
-      $SRC_DIR/cmark
-    cd $SRC_DIR
+      -DCMAKE_C_COMPILER="$LFS_TGT-gcc" \
+      -DCMAKE_CXX_COMPILER="$LFS_TGT-g++" \
+      -DCMAKE_C_FLAGS="$INCLUDE_FLAGS $BINARY_FLAGS" \
+      -DCMAKE_CXX_FLAGS="$INCLUDE_FLAGS $BINARY_FLAGS" \
+      -DCMAKE_EXE_LINKER_FLAGS="" \
+      -DCMAKE_SHARED_LINKER_FLAGS="" \
+      $SRC_DIR/apple/cmark
+    cd $SRC_DIR/apple
     PATH="$CROSS_DIR/bin/:$PATH" cmake --build $CMARK_BUILD_DIR -- -j${PARALLEL}
     PATH="$CROSS_DIR/bin/:$PATH" cd $CMARK_BUILD_DIR && ninja install
     touch $CMARK_BUILD_DIR/.cmark-build-cross
@@ -68,8 +71,8 @@ function llvm() {
       -DLLVM_USE_LINKER=gold \
       -DLLVM_INCLUDE_DOCS=TRUE \
       -DLLVM_LIT_ARGS=-sv \
-      $SRC_DIR/llvm
-    cd $SRC_DIR
+      $SRC_DIR/apple/llvm
+    cd $SRC_DIR/apple
     PATH="$CROSS_DIR/bin:$PATH" cmake --build $LLVM_BUILD_DIR
     PATH="$CROSS_DIR/bin:$PATH" cd $LLVM_BUILD_DIR && ninja install
     touch $LLVM_BUILD_DIR/.llvm-build-cross
