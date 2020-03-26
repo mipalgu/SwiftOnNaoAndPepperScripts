@@ -5,7 +5,8 @@ source setup.sh
 
 function xbinutils() {
 	function xbinutils_configure() {
-		$SRC_DIR/binutils-$BINUTILS_VERSION/configure --prefix="$CROSS_DIR" \
+		$SRC_DIR/binutils-$BINUTILS_VERSION/configure \
+			--prefix="$CROSS_DIR" \
 			--target=${TRIPLE} \
 			--enable-gold=yes \
 			--enable-multilib=yes \
@@ -17,7 +18,7 @@ function xbinutils() {
 check $BUILD_DIR/.xbinutils xbinutils
 
 function xgcc() {
-	function gcc_untar() {
+	function xgcc_untar() {
 		tar -xzvf gcc-$GCC_VERSION.tar.gz
 		cd gcc-$GCC_VERSION
 		./contrib/download_prerequisites
@@ -40,17 +41,17 @@ function xgcc() {
 		cd $BUILD_DIR/gcc
 		$SRC_DIR/gcc-$GCC_VERSION/configure \
 			--prefix=$CROSS_DIR \
-			--with-local-prefix=$LFS/usr/local \
+			--with-local-prefix="$LFS/usr/local" \
 			--with-native-system-header-dir=$LFS/include \
 			--target=${TRIPLE} \
 			--with-sysroot="$LFS"
 			--enable-languages=c,c++ \
 			--disable-libstdcxx-pch \
-			--disable-multilib \
+			--enable-multilib \
 			--disable-bootstrap \
 			--disable-libgomp
 	}
 	rm -rf $BUILD_DIR/gcc
-	compile "gcc" "$GCC_VERSION gcc_untar
+	compile "gcc" "$GCC_VERSION" xgcc_untar xgcc_configure
 }
 check $BUILD_DIR/.xgcc xgcc
