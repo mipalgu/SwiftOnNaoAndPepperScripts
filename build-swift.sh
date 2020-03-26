@@ -3,18 +3,24 @@ set -e
 
 source build-config.sh
 
-cd $WD
-source cross.sh
-cd $SRC_DIR
+ARCH=i686
+VENDOR=pc
+OS=linux
+TRIPLE=$ARCH-$VENDOR-$OS-gnu
+LFS_TGT=$(uname -m)-lfs-linux-gnu
+INSTALL_PREFIX=$LFS
+INCLUDE_FLAGS="-I$LFS/usr/include -I$LFS/include"
+LINK_FLAGS="-L$LFS/usr/lib -L$LFS/lib"
+CPATH="$LFS/include"
+LIBRARY_PATH="$LFS/usr/lib:$LFS/lib"
 
-if [ ! -f $SWIFT_BUILD_DIR/.swift-build-cross ]
-then
+function swift() {
     echo "Compiling swift."
     rm -rf $SWIFT_BUILD_DIR
     mkdir -p $SWIFT_BUILD_DIR
     cd $SWIFT_BUILD_DIR
-    PATH="$CROSS_DIR/bin:$PATH" CC="$HOST_CLANG" CXX="$HOST_CLANGXX" CPATH="$CPATH" LIBRARY_PATH="$LIBRARY_PATH" cmake -G "Ninja" \
-      -DCMAKE_PREFIX_PATH="$PREFIX_PATH" \
+    PATH="$LFS/bin:$PATH" CC="$HOST_CLANG" CXX="$HOST_CLANGXX" CPATH="$CPATH" LIBRARY_PATH="$LIBRARY_PATH" cmake -G "Ninja" \
+      -DCMAKE_PREFIX_PATH="$LFS" \
       -DCMAKE_CROSSCOMPILING=TRUE \
       -DCMAKE_SYSROOT="$LFS" \
       -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
@@ -65,7 +71,7 @@ then
       -DClang_DIR="$LLVM_BUILD_DIR/lib/cmake/clang" \
       -DSWIFT_INCLUDE_TOOLS=FALSE \
       $SRC_DIR/swift
-    cd $SRC_DIR
+    cd $WD
     cmake --build $SWIFT_BUILD_DIR -- -j${PARALLEL}
     touch $SWIFT_BUILD_DIR/lib/swift/linux/i686/StdlibUnicodeUnittest.swiftmodule
     touch $SWIFT_BUILD_DIR/lib/swift/linux/i686/StdlibUnicodeUnittest.swiftdoc
@@ -76,7 +82,7 @@ then
     touch $SWIFT_BUILD_DIR/lib/swift/linux/i686/StdlibCollectionUnittest.swiftinterface
     touch $SWIFT_BUILD_DIR/lib/swift/linux/libswiftStdlibCollectionUnittest.so
     cd $SWIFT_BUILD_DIR && ninja install
-    touch $SWIFT_BUILD_DIR/.swift-build-cross
-fi
+}
+check $SWIFT_BUILD_DIR/.swift swift
 
 cd $WD
