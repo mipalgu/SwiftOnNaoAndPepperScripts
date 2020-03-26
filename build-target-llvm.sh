@@ -19,8 +19,9 @@ fi
 
 LFS_TGT=$(uname -m)-lfs-linux-gnu
 INSTALL_PREFIX=$LFS
-INCLUDE_FLAGS="-I$LFS/include"
-LINK_FLAGS="-L$LFS/lib"
+INCLUDE_FLAGS="-I$LFS/usr/include -I$LFS/include"
+LINK_FLAGS="-L$LFS/usr/lib -L$LFS/lib"
+LIBRARY_PATH="$LFS/usr/lib:$LFS/lib"
 
 function cmark() {
     echo "Compiling cmark."
@@ -52,9 +53,10 @@ function llvm() {
     rm -rf $LLVM_BUILD_DIR
     mkdir -p $LLVM_BUILD_DIR
     cd $LLVM_BUILD_DIR
-    PATH="$CROSS_DIR/bin:$PATH" CC="$LFS_TGT-gcc" CXX="$LFS_TGT-g++" LD="$LFS/bin/ld.gold" CPATH="$CPATH" LIBRARY_PATH="$LIBRARY_PATH" /usr/local/bin/cmake -G "Ninja" \
+    PATH="$CROSS_DIR/bin:$PATH" CC="$LFS/bin/gcc" CXX="$LFS/bin/g++" LD="$LFS/bin/ld.gold" CPATH="$CPATH" LIBRARY_PATH="$LIBRARY_PATH" /usr/local/bin/cmake -G "Ninja" \
       -DCMAKE_SYSTEM_NAME="Linux" \
       -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
+      -DCMAKE_SYSROOT="$LFS" \
       -DLLVM_ENABLE_PROJECTS="$LLVM_CROSS_PROJECTS" \
       -DLLVM_ENABLE_ASSERTIONS=TRUE \
       -DPYTHON_EXECUTABLE="${PYTHON}" \
@@ -62,6 +64,9 @@ function llvm() {
       -DCMAKE_CXX_FLAGS="-fpermissive $INCLUDE_FLAGS" \
       -DCMAKE_EXE_LINKER_FLAGS="$LINK_FLAGS" \
       -DCMAKE_SHARED_LINKER_FLAGS="$LINK_FLAGS" \
+      -DCMAKE_INCLUDE_PATH="$LFS/usr/include;$LFS/include" \
+      -DCMAKE_LIBRARY_PATH="$LFS/usr/lib;$LFS/lib" \
+      -DZLIB_ROOT="$LFS/usr" \
       -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
       -DLLVM_INCLUDE_DOCS=TRUE \
       -DLLVM_LIT_ARGS=-sv \

@@ -15,7 +15,7 @@ GCC="$LFS/bin/gcc"
 GXX="$LFS/bin/g++"
 export PATH LIBRARY_PATH CPATH
 
-INSTALL_PREFIX=$LFS/usr
+INSTALL_PREFIX=$LFS
 
 # Zlib
 compile "zlib" "$ZLIB_VERSION"
@@ -74,35 +74,6 @@ compile "gawk" "$GAWK_VERSION" "tar -xvf gawk-$GAWK_VERSION.tar.xz"
 
 # GNU make
 compile "make" "$MAKE_VERSION" "tar -xvf make-$MAKE_VERSION.tar.bz2"
-
-# Python
-#rm -rf Python-$PYTHON_VERSION
-#tar -xvf Python-$PYTHON_VERSION.tar.xz
-#rm -rf $LFS/Python-$PYTHON_VERSION
-#mv Python-$PYTHON_VERSION $LFS/Python-$PYTHON_VERSION
-#rm -rf $LFS/build-python
-#mkdir $LFS/build-python
-
-# ninja
-#rm -rf ninja-$NINJA_VERSION
-#tar -xvf ninja-$NINJA_VERSION.tar.gz
-#rm -rf $LFS/ninja-$NINJA_VERSION
-#mv ninja-$NINJA_VERSION $LFS/ninja-$NINJA_VERSION
-#rm -rf $LFS/build-ninja
-#mkdir $LFS/build-ninja
-
-# CMake
-#rm -rf cmake-$CMAKE_VERSION
-#tar -xzvf cmake-$CMAKE_VERSION.tar.gz
-#rm -rf $LFS/cmake-$CMAKE_VERSION
-#mv cmake-$CMAKE_VERSION $LFS/cmake-$CMAKE_VERSION
-#rm -rf $LFS/build-cmake
-#mkdir $LFS/build-cmake
-
-# Openssl
-#rm -rf openssl-$OPENSSL_VERSION
-#tar -xzvf openssl-$OPENSSL_VERSION.tar.gz
-#rm -rf $LFS/op
 
 # Copy scripts into $LFS
 cp setup.sh $LFS
