@@ -13,6 +13,7 @@ PLATFORM=$ARCH-$OS
 LFS=/home/nao/tools
 SRC_DIR=$WD/src
 BUILD_DIR=$WD/build
+CROSS_DIR=$WD/cross
 
 mkdir -p $SRC_DIR
 mkdir -p $BUILD_DIR
