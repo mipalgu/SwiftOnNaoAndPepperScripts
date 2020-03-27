@@ -53,8 +53,8 @@ function swift() {
       -DSWIFT_PRIMARY_VARIANT_TRIPLE="$TRIPLE" \
       -DCMAKE_C_FLAGS="-gcc-toolchain $LFS -Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS -I$LFS/$TRIPLE/include/c++/$GCC_VERSION -I$LFS/$TRIPLE/include/c++/$GCC_VERSION/$TRIPLE" \
       -DCMAKE_CXX_FLAGS="-gcc-toolchain $LFS -Wno-c++11-narrowing -target ${TRIPLE} $INCLUDE_FLAGS -fno-use-cxa-atexit -fPIC $BINARY_FLAGS -I$LFS/$TRIPLE/include/c++/$GCC_VERSION -I$LFS/$TRIPLE/include/c++/$GCC_VERSION/$TRIPLE" \
-      -DCMAKE_EXE_LINKER_FLAGS="$LINK_FLAGS -gcc-toolchain $LFS -fuse-ld="$CROSS_DIR/bin/$TRIPLE-ld.gold" -fno-use-cxa-atexit -luuid -lpthread -fvisibility=protected -Bsymbolic" \
-      -DCMAKE_SHARED_LINKER_FLAGS="$LINK_FLAGS -gcc-toolchain $LFS -fuse-ld="$CROSS_DIR/bin/$TRIPLE-ld.gold" -fno-use-cxa-atexit -luuid -lpthread -fvisibility=protected -Bsymbolic" \
+      -DCMAKE_EXE_LINKER_FLAGS="$LINK_FLAGS -gcc-toolchain $LFS -fuse-ld="$CROSS_DIR/bin/$TRIPLE-ld.gold" -fno-use-cxa-atexit -luuid -lpthread -fvisibility=protected -Bsymbolic -R$LFS/lib" \
+      -DCMAKE_SHARED_LINKER_FLAGS="$LINK_FLAGS -gcc-toolchain $LFS -fuse-ld="$CROSS_DIR/bin/$TRIPLE-ld.gold" -fno-use-cxa-atexit -luuid -lpthread -fvisibility=protected -Bsymbolic -R$LFS/lib" \
       -DSWIFT_ENABLE_GOLD_LINKER=TRUE \
       -DSWIFT_ENABLE_LLD_LINKER=FALSE \
       -DSWIFT_NATIVE_SWIFT_TOOLS_PATH="/usr/local/var/swiftenv/shims" \
