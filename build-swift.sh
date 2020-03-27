@@ -82,6 +82,16 @@ function swift() {
     touch $SWIFT_BUILD_DIR/lib/swift/linux/i686/StdlibCollectionUnittest.swiftinterface
     touch $SWIFT_BUILD_DIR/lib/swift/linux/libswiftStdlibCollectionUnittest.so
     cd $SWIFT_BUILD_DIR && ninja install
+    cd $LFS/lib/swift/linux/$ARCH
+    file=glibc.modulemap
+    if [ -f $file.bak ]
+    then
+        cp $file.bak $file
+    else
+        cp $file $file.bak
+    fi
+    sed -e "s@header \"/usr@header \"$LFS@g" > $file
+    cd $WD
 }
 check $SWIFT_BUILD_DIR/.swift swift
 
