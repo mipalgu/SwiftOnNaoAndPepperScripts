@@ -19,7 +19,7 @@ fi
 if [ ! -d "$SRC_DIR/apple/llvm" ]
 then
     cd $SRC_DIR/apple
-    /usr/local/bin/python swift/utils/update-checkout --clone --tag $SWIFT_VERSION
+    PATH="/usr/local/bin:$PATH" python swift/utils/update-checkout --clone --tag $SWIFT_VERSION
     cd ..
 fi
 

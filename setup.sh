@@ -8,7 +8,9 @@ SETUP_SH_INCLUDED=yes
 source versions.sh
 WD=`pwd`
 ARCH=i686
+VENDOR=pc
 OS=linux
+TRIPLE=$ARCH-$VENDOR-$OS-gnu
 PLATFORM=$ARCH-$OS
 LFS=/home/nao/tools
 SRC_DIR=$WD/src

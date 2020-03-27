@@ -5,15 +5,16 @@ source setup.sh
 
 function xbinutils() {
 	function xbinutils_configure() {
-		$SRC_DIR/binutils-$BINUTILS_VERSION/configure \
+		 $SRC_DIR/binutils-$BINUTILS_VERSION/configure \
 			--prefix="$CROSS_DIR" \
 			--target=${TRIPLE} \
 			--enable-gold=yes \
 			--enable-multilib=yes \
+			--disable-werror \
 			--with-sysroot="$LFS"
 	}
 	rm -rf $BUILD_DIR/binutils
-	compile "binutils" "$BINUTILS_VERSION"
+	compile "binutils" "$BINUTILS_VERSION" "" xbinutils_configure
 }
 check $BUILD_DIR/.xbinutils xbinutils
 
@@ -54,4 +55,4 @@ function xgcc() {
 	rm -rf $BUILD_DIR/gcc
 	compile "gcc" "$GCC_VERSION" xgcc_untar xgcc_configure
 }
-check $BUILD_DIR/.xgcc xgcc
+#check $BUILD_DIR/.xgcc xgcc
