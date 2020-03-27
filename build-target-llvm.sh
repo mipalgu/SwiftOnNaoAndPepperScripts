@@ -17,6 +17,10 @@ then
     ln -s $SRC_DIR/apple/libcxxabi .
 fi
 
+PATH="$LFS/bin:/bin:/usr/bin"
+LIBRARY_PATH="$LFS/usr/local/lib:$LFS/usr/lib:$LFS/lib"
+CPATH="$LFS/usr/local/include:$LFS/usr/include:$LFS/include:$LFS/usr/include/ncurses"
+INSTALL_PREFIX=$LFS/usr
 LFS_TGT=$(uname -m)-lfs-linux-gnu
 INSTALL_PREFIX=$LFS
 INCLUDE_FLAGS="-I$LFS/usr/include -I$LFS/include"

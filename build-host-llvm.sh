@@ -5,7 +5,7 @@ source setup.sh
 #source setup-sysroot.sh
 source build-config.sh
 
-cd $SRC_DIR
+cd $SRC_DIR/apple
 cd llvm/tools
 rm -f clang
 rm -f compiler-rt
@@ -13,19 +13,17 @@ ln -s $SRC_DIR/clang .
 ln -s $SRC_DIR/compiler-rt .
 
 
-if [ ! -f $CMARK_HOST_BUILD_DIR/.cmark-build-host ]
-then
+function cmark_host() {
     echo "Compiling cmark for host."
     rm -rf $CMARK_HOST_BUILD_DIR
     mkdir -p $CMARK_HOST_BUILD_DIR
-    cd $CMARK_HOST_BUILD_DIR && cmake -G "Ninja" $SRC_DIR/cmark
-    cd $SRC_DIR/apple
-    CC=/usr/bin/clang CXX=/usr/bin/clang++ cmake --build $CMARK_HOST_BUILD_DIR -- -j${PARALLEL}
-    touch $CMARK_HOST_BUILD_DIR/.cmark-build-host
-fi
+    cd $CMARK_HOST_BUILD_DIR && CC=clang CXX=clang++ cmake -G "Ninja" $SRC_DIR/apple/cmark
+    cd $WD
+    cmake --build $CMARK_HOST_BUILD_DIR -- -j${PARALLEL}
+}
+check $BUILD_DIR/.cmark-host cmark_host
 
-if [ ! -f $LLVM_HOST_BUILD_DIR/.llvm-build-host ]
-then
+function llvm_host() {
     echo "Compiling Host LLVM with clang and compiler-rt."
     rm -rf $LLVM_HOST_BUILD_DIR
     mkdir -p $LLVM_HOST_BUILD_DIR
@@ -37,10 +35,10 @@ then
       -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE \
       -DLLVM_INCLUDE_DOCS=TRUE \
       -DLLVM_LIT_ARGS=-sv \
-      $SRC_DIR/llvm
-    cd $SRC_DIR
+      $SRC_DIR/apple/llvm
+    cd $WD
     cmake --build $LLVM_HOST_BUILD_DIR -- -j${PARALLEL}
-    touch $LLVM_HOST_BUILD_DIR/.llvm-build-host
-fi
+}
+check $BUILD_DIR/.llvm-host llvm_host
 
 cd $WD
