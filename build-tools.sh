@@ -38,8 +38,8 @@ function ninja_install() {
 compile "ninja" "$NINJA_VERSION" "" ninja_configure ninja_build ninja_install
 
 function python_untar() {
-	tar -xzvf python-$PYTHON3_VERSION.tar.gz
-	mv cpython-$PYTHON3_VERSION python-$PYTHON3_VERSION
+	tar -xzvf python-$PYTHON2_VERSION.tar.gz
+	mv cpython-$PYTHON2_VERSION python-$PYTHON2_VERSION
 }
 function python_configure() {
 	$SRC_DIR/python-$PYTHON2_VERSION/configure --prefix=/usr/local
