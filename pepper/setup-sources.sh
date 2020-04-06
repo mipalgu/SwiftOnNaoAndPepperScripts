@@ -12,36 +12,6 @@ then
     tar -xzf binutils-$BINUTILS_VERSION.tar.gz
 fi
 
-if [ ! -d "gcc-$GCC_VERSION-patched/cloog" ]
-then
-    if [ ! -d "gcc-$GCC_VERSION" ]
-    then
-        [ ! -f "gcc-${GCC_VERSION}.tar.gz" ] && wget https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.gz
-        tar -xzf gcc-${GCC_VERSION}.tar.gz
-    fi
-    if [ ! -d "gcc-$GCC_VERSION/cloog" ]
-    then
-        cd gcc-$GCC_VERSION && ./contrib/download_prerequisites
-        cd $WD
-    fi
-    cp -R gcc-$GCC_VERSION gcc-$GCC_VERSION-patched
-    for file in \
-     $(find gcc-$GCC_VERSION-patched/config -name linux64.h -o -name linux.h -o -name sysv4.h)
-    do
-      cp -uv $file{,.orig}
-      sed -e "s@/lib\(64\)\?\(32\)\?/ld@/$CROSS_DIR/bin&@g" \
-          -e "s@/usr@/$CROSS_DIR@g" $file.orig > $file
-      echo '
-#undef STANDARD_STARTFILE_PREFIX_1
-#undef STANDARD_STARTFILE_PREFIX_2
-#define STANDARD_STARTFILE_PREFIX_1 "/tools/lib/"
-#define STANDARD_STARTFILE_PREFIX_2 ""' >> $file
-      touch $file.orig
-    done
-    sed -i '/k prot/agcc_cv_libc_provides_ssp=yes' gcc-$GCC_VERSION-patched/configure
-    cd $WD
-fi
-
 if [ ! -d "libuuid-$UUID_VERSION" ]
 then
     [ ! -f "libuuid-$UUID_VERSION.tar.gz" ] && wget http://sourceforge.net/projects/libuuid/files/libuuid-$UUID_VERSION.tar.gz/download
@@ -80,17 +50,19 @@ fi
 
 if [ -d apple/llvm-project ]
 then
-    for f in apple/llvm-project/*
+    cd apple
+    for f in llvm-project/*
     do
         if [ -d "$f" ]
         then
-            if [[ ! -L "apple/`basename $f`" && ! -d "apple/`basename $f`" ]]
+            if [[ ! -L "`basename $f`" && ! -d "`basename $f`" ]]
 	    then
-                echo "symlink: ln -s $f apple/"
-                ln -s $f apple/
+                echo "symlink: ln -s $f ."
+                ln -s $f .
             fi
         fi
     done
+    cd ..
 fi
 
 if [[ ! -L "apple/libcxxabi" && ! -d "apple/libcxxabi" ]]
