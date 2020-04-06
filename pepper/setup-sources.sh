@@ -50,17 +50,19 @@ fi
 
 if [ -d apple/llvm-project ]
 then
-    for f in apple/llvm-project/*
+    cd apple
+    for f in llvm-project/*
     do
         if [ -d "$f" ]
         then
-            if [[ ! -L "apple/`basename $f`" && ! -d "apple/`basename $f`" ]]
+            if [[ ! -L "`basename $f`" && ! -d "`basename $f`" ]]
 	    then
-                echo "symlink: ln -s $f apple/"
-                ln -s $f apple/
+                echo "symlink: ln -s $f ."
+                ln -s $f .
             fi
         fi
     done
+    cd ..
 fi
 
 if [[ ! -L "apple/libcxxabi" && ! -d "apple/libcxxabi" ]]
