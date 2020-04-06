@@ -40,6 +40,7 @@ then
       -DCMAKE_CXX_FLAGS="-gcc-toolchain $CROSS_DIR $INCLUDE_FLAGS $BINARY_FLAGS" \
       -DCMAKE_EXE_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR" \
       -DCMAKE_SHARED_LINKER_FLAGS="-gcc-toolchain $CROSS_DIR" \
+      -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=TRUE \
       $SRC_DIR/cmark
     cd $SRC_DIR
     PATH="$CROSS_DIR/bin/:$PATH" cmake --build $CMARK_BUILD_DIR -- -j${PARALLEL}
