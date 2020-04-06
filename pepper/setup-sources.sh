@@ -91,6 +91,7 @@ then
             fi
         fi
     done
+    mkdir -p apple/llvm/tools
 fi
 
 if [[ ! -L "apple/libcxxabi" && ! -d "apple/libcxxabi" ]]
