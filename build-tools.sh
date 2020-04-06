@@ -4,19 +4,44 @@ set -e
 source setup.sh
 source versions.sh
 
-rm -rf cmake-$CMAKE_VERSION
-tar -xzvf cmake-$CMAKE_VERSION.tar.gz
-rm -rf build-cmake
-mkdir build-cmake
-cd build-cmake
-../cmake-$CMAKE_VERSION/configure
-make
-make install
-cd $SRC_DIR
+INSTALL_PREFIX=/usr
 
-rm -rf ninja-$NINJA_VERSION
-tar -xzvf ninja-$NINJA_VERSION.tar.gz
-cd ninja-$NINJA_VERSION
-./configure.py --bootstrap
-install ninja /usr/local/bin
-cd $SRC_DIR
+compile "curl" "$CURL_VERSION"
+
+function git_configure() {
+	cp -R $SRC_DIR/git-$GIT_VERSION/* .
+	make configure
+	./configure --prefix=$INSTALL_PREFIX
+}
+function git_build() {
+	make all
+}
+compile "git" "$GIT_VERSION" "tar -xvf git-$GIT_VERSION.tar.xz" git_configure git_build
+
+#CMake
+function cmake_configure() {
+	$SRC_DIR/cmake-$CMAKE_VERSION/configure --prefix=/usr/local
+}
+compile "cmake" "$CMAKE_VERSION" "" cmake_configure
+
+#Ninja
+function ninja_configure() {
+	cp -r $SRC_DIR/ninja-$NINJA_VERSION/* .
+	./configure.py --bootstrap
+}
+function ninja_build() {
+	echo "skip"
+}
+function ninja_install() {
+	sudo install ninja $INSTALL_PREFIX/bin
+}
+compile "ninja" "$NINJA_VERSION" "" ninja_configure ninja_build ninja_install
+
+function python_untar() {
+	tar -xzvf python-$PYTHON2_VERSION.tar.gz
+	mv cpython-$PYTHON2_VERSION python-$PYTHON2_VERSION
+}
+function python_configure() {
+	$SRC_DIR/python-$PYTHON2_VERSION/configure --prefix=/usr/local
+}
+compile "python" "$PYTHON2_VERSION" python_untar python_configure
