@@ -58,15 +58,14 @@ then
     git clone https://github.com/apple/swift.git
     cd swift
     git checkout $SWIFT_VERSION
-    cd ..
-    cd ..
+    cd $WD
 fi
 
 if [ ! -d "apple/llvm" ]
 then
     cd apple
     ./swift/utils/update-checkout --clone --tag $SWIFT_VERSION
-    cd ..
+    cd $WD
 fi
 
 if [ ! -d "apple/icu" ]
@@ -76,12 +75,27 @@ then
     tag=`grep "\"icu\": \"" swift/utils/update_checkout/update-checkout-config.json | uniq | sed 's/.*"icu": "\(.*\)\([0-9]*\)-\([0-9]*\).*/\1\2-\3/'`
     cd icu
     git checkout "$tag"
-    cd ../..
+    cd $WD
 fi
 
-if [ "$BUILD_LIBCXX" = true ]
+if [ -d apple/llvm-project ]
 then
-    if [ ! -d "apple/libcxxabi" ]
+    for f in apple/llvm-project/*
+    do
+        if [ -d "$f" ]
+        then
+            if [[ ! -L "apple/`basename $f`" && ! -d "apple/`basename $f`" ]]
+	    then
+                echo "symlink: ln -s $f apple/"
+                ln -s $f apple/
+            fi
+        fi
+    done
+fi
+
+if [[ ! -L "apple/libcxxabi" && ! -d "apple/libcxxabi" ]]
+then
+    if [ "$BUILD_LIBCXX" = true ]
     then
         if [ ! -f "libcxxabi-9.0.0.src.tar.xz" ]
         then
