@@ -19,6 +19,11 @@ then
     tar -xzf libuuid-$UUID_VERSION.tar.gz
 fi
 
+if [ ! -d "cmake-$CMAKE_VERSION" ]
+then
+    [ ! -f "cmake-$CMAKE_VERSION.tar.gz" ] && wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION.tar.gz
+    tar -xzvf cmake-$CMAKE_VERSION.tar.gz
+fi
 
 mkdir -p apple
 
