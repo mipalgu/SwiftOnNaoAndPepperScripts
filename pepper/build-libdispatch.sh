@@ -20,10 +20,7 @@ then
     /usr/local/var/swiftenv/bin/swiftenv local $swiftenv_swift_version-pepper
     rm -rf $LIBDISPATCH_BUILD_DIR
     mkdir -p $LIBDISPATCH_BUILD_DIR
-    if [ ! -f $SRC_DIR/swift-corelibs/libdispatch/dispatch/module.modulemap ]
-    then
-        cp $SRC_DIR/swift/corelibs/libdispatch/dispatch/module.modulemap.orig $SRC_DIR/swift/corelibs/libdispatch/dispatch/module.modulemap
-    fi
+    echo "$SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap"
     cd $LIBDISPATCH_BUILD_DIR
     PATH="$CROSS_DIR/bin:$PATH" CC="$HOST_CLANG" CXX="$HOST_CLANGXX" CPATH="$CPATH" LIBRARY_PATH="$LIBRARY_PATH" LD="$CROSS_DIR/bin/$TRIPLE-ld.gold" cmake -G "Ninja" \
 	    -DCMAKE_CROSSCOMPILING=TRUE \
