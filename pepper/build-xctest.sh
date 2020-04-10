@@ -15,11 +15,10 @@ then
     /usr/local/var/swiftenv/bin/swiftenv local $swiftenv_swift_version-pepper
     rm -rf $XCTEST_BUILD_DIR
     mkdir -p $XCTEST_BUILD_DIR
-    if [ ! -f $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap.orig ]
+    if [ -f $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap ]
     then
-	    cp $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap.orig
+	    mv $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap.orig
     fi
-    rm -f $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap
     cd $XCTEST_BUILD_DIR
     PATH="$CROSS_DIR/bin:$PATH" CC="$HOST_CLANG" CXX="$HOST_CLANGXX" CPATH="$CPATH" LIBRARY_PATH="$LIBRARY_PATH" LD="$CROSS_DIR/bin/$TRIPLE-ld.gold" cmake -G "Ninja" \
 	    -DCMAKE_CROSSCOMPILING=TRUE \

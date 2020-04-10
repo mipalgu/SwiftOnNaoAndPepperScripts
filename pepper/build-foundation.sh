@@ -12,11 +12,10 @@ if [ ! -f $FOUNDATION_BUILD_DIR/.foundation-build-cross ]
 then
     echo "Compiling Foundation."
     /usr/local/var/swiftenv/bin/swiftenv local $swiftenv_swift_version-pepper
-    if [ ! -f $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap.orig ]
+    if [ -f $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap ]
     then
-	    cp $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap.orig
+	    mv $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap.orig
     fi
-    rm $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap
     rm -rf $FOUNDATION_BUILD_DIR
     mkdir -p $FOUNDATION_BUILD_DIR
     cd $FOUNDATION_BUILD_DIR
