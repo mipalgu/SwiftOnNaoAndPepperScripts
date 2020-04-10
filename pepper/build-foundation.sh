@@ -19,6 +19,10 @@ then
     rm -rf $FOUNDATION_BUILD_DIR
     mkdir -p $FOUNDATION_BUILD_DIR
     cd $FOUNDATION_BUILD_DIR
+    if [ -f $CROSS_TOOLCHAIN_DIR/curl/share/cmake/curl/curl-config.cmake ]
+    then
+        mv $CROSS_TOOLCHAIN_DIR/curl/share/cmake/curl/curl-config.cmake $CROSS_TOOLCHAIN_DIR/curl/share/cmake/curl/curl-config.cmake.orig
+    fi
     PATH="$CROSS_DIR/bin:$PATH" CC="$HOST_CLANG" CXX="$HOST_CLANGXX" CPATH="$CPATH" LIBRARY_PATH="$LIBRARY_PATH" LD="$CROSS_DIR/bin/$TRIPLE-ld.gold" cmake -G "Ninja" \
 	    -DCMAKE_CROSSCOMPILING=TRUE \
 	    -DCMAKE_SYSTEM_NAME="Linux" \
@@ -53,6 +57,10 @@ then
 	    -DBUILD_SHARED_LIBS=YES \
 	    -DCMAKE_SYSTEM_PROCESSOR=$ARCH \
 	    $SRC_DIR/swift-corelibs-foundation
+    if [ -f $CROSS_TOOLCHAIN_DIR/curl/share/cmake/curl/curl-config.cmake.orig ]
+    then
+        mv $CROSS_TOOLCHAIN_DIR/curl/share/cmake/curl/curl-config.cmake.orig $CROSS_TOOLCHAIN_DIR/curl/share/cmake/curl/curl-config.cmake
+    fi
     cd $SRC_DIR
     PATH="$CROSS_DIR/bin:$PATH" cmake --build $FOUNDATION_BUILD_DIR
     PATH="$CROSS_DIR/bin:$PATH" cd $FOUNDATION_BUILD_DIR && ninja install
