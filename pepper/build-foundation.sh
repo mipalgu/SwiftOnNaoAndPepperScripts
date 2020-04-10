@@ -14,7 +14,7 @@ then
     /usr/local/var/swiftenv/bin/swiftenv local $swiftenv_swift_version-pepper
     if [ ! -f $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap.orig ]
     then
-	    cp $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap $SRC_DIR/swift-corelibs-libdispatch/dispatch.module.modulemap
+	    cp $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap.orig
     fi
     rm $SRC_DIR/swift-corelibs-libdispatch/dispatch/module.modulemap
     rm -rf $FOUNDATION_BUILD_DIR
