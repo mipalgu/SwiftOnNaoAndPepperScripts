@@ -64,9 +64,11 @@ then
       -DLIBXML2_LIBRARY="$CROSS_DIR/xml2/lib/libxml2.so" \
       -DLLVM_DIR="$LLVM_BUILD_DIR/lib/cmake/llvm" \
       -DClang_DIR="$LLVM_BUILD_DIR/lib/cmake/clang" \
+      -DGLIBC_INCLUDE_PATH="$LFS/include" \
       -DSWIFT_BUILD_SOURCEKIT=NO \
       -DSWIFT_BUILD_SYNTAXPARSERLIB=NO \
       -DSWIFT_INCLUDE_TOOLS=FALSE \
+      -DSWIFT_SDK_LINUX_ARCH_i686_LIBC_INCLUDE_DIRECTORY="$LFS/usr/include" \
       $SRC_DIR/swift
     cd $SRC_DIR
     cmake --build $SWIFT_BUILD_DIR -- -j${PARALLEL}
