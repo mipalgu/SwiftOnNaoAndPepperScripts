@@ -9,7 +9,7 @@ then
     mkdir $WD/build-binutils
     cd $WD/build-binutils
     PATH="$CROSS_TOOLCHAIN_DIR/bin:$PATH" $WD/binutils-$BINUTILS_VERSION/configure --prefix="$CROSS_DIR" --target=${TRIPLE} --enable-gold=yes --enable-multilib=yes --with-sysroot="$LFS"
-    PATH="$CROSS_TOOLCHAIN_DIR/bin:$PATH" make -j${PARALLEL}
+    PATH="$CROSS_TOOLCHAIN_DIR/bin:$PATH" make
     PATH="$CROSS_TOOLCHAIN_DIR/bin:$PATH" make install
     cd $WD
 fi
