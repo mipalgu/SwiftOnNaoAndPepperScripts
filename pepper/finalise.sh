@@ -2,17 +2,24 @@
 set -e
 source setup.sh
 
-MIPAL_CROSS=$CROSS_DIR-mipal
-MIPAL_CROSSTOOLCHAIN=$WD/crosstoolchain
+prefix_folder=`basename $INSTALL_PREFIX`
+cross_toolchain=`basename $CROSS_TOOLCHAIN_DIR`
+
+FINALISE_DIR=$BUILD_DIR/finalise
+mkdir -p $FINALISE_DIR
+
+MIPAL_CROSS=$FINALISE_DIR/$cross_toolchain
+MIPAL_CROSSTOOLCHAIN=$FINALISE_DIR/crosstoolchain
+mipal_cross_toolchain=`basename "$MIPAL_CROSSTOOLCHAIN"`
 
 # Create ctc.tar.gz
 if [ ! -f $WD/ctc.tar.gz ]
 then
-    tar -czf pepper.tar.gz $INSTALL_PREFIX/lib
+    tar -czf pepper.tar.gz -C $INSTALL_PREFIX/.. $prefix_folder
     rm -rf $CROSS_TOOLCHAIN_DIR/$TRIPLE/sysroot/home
     mkdir -p $CROSS_TOOLCHAIN_DIR/$TRIPLE/sysroot/home/nao/swift-tc
     cp -r $INSTALL_PREFIX/* $CROSS_TOOLCHAIN_DIR/$TRIPLE/sysroot/home/nao/swift-tc/
-    tar -czvf ctc.tar.gz $CROSS_DIR
+    tar -czvf ctc.tar.gz -C $CROSS_TOOLCHAIN_DIR/.. $cross_toolchain
 fi
 
 # Create MiPal ctc.
@@ -35,7 +42,7 @@ then
     ln -s ../../../../lib/gcc/$TRIPLE/$GCC_VERSION/crtbegin.o $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/
     ln -s ../../../../lib/gcc/$TRIPLE/$GCC_VERSION/crtend.o $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/
     ln -s ../../../../lib/gcc/$TRIPLE/$GCC_VERSION/crtendS.o $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/
-    tar -czf ctc-mipal.tar.gz $MIPAL_CROSS
+    tar -czf ctc-mipal.tar.gz -C $FINALISE_DIR $cross_toolchain
 fi
 
 # Create crosstoolchain directory.
@@ -62,5 +69,5 @@ then
     ln -s atom/cross/$TRIPLE/sysroot $MIPAL_CROSSTOOLCHAIN/staging/atom-linux
     ln -s atom-linux $MIPAL_CROSSTOOLCHAIN/staging/$TRIPLE
     ln -s atom-linux $MIPAL_CROSSTOOLCHAIN/staging/$ARCH-$OS
-    tar -czf crosstoolchain.tar.gz $MIPAL_CROSSTOOLCHAIN
+    tar -czf crosstoolchain.tar.gz -C $FINALISE $mipal_cross_toolchain
 fi
