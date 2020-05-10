@@ -12,10 +12,15 @@ MIPAL_CROSS=$FINALISE_DIR/$cross_toolchain
 MIPAL_CROSSTOOLCHAIN=$FINALISE_DIR/crosstoolchain
 mipal_cross_toolchain=`basename "$MIPAL_CROSSTOOLCHAIN"`
 
+# Create pepper.tar.gz
+if [ ! -f $WD/pepper.tar.gz ]
+then
+	tar -czvf pepper.tar.gz -C $INSTALL_PREFIX/.. $prefix_folder/lib
+fi
+
 # Create ctc.tar.gz
 if [ ! -f $WD/ctc.tar.gz ]
 then
-    tar -czf pepper.tar.gz -C $INSTALL_PREFIX/.. $prefix_folder
     rm -rf $CROSS_TOOLCHAIN_DIR/$TRIPLE/sysroot/home
     mkdir -p $CROSS_TOOLCHAIN_DIR/$TRIPLE/sysroot/home/nao/swift-tc
     cp -r $INSTALL_PREFIX/* $CROSS_TOOLCHAIN_DIR/$TRIPLE/sysroot/home/nao/swift-tc/
@@ -42,7 +47,7 @@ then
     ln -s ../../../../lib/gcc/$TRIPLE/$GCC_VERSION/crtbegin.o $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/
     ln -s ../../../../lib/gcc/$TRIPLE/$GCC_VERSION/crtend.o $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/
     ln -s ../../../../lib/gcc/$TRIPLE/$GCC_VERSION/crtendS.o $MIPAL_CROSS/cross/$TRIPLE/sysroot/usr/lib/
-    tar -czf ctc-mipal.tar.gz -C $FINALISE_DIR $cross_toolchain
+    tar -czvf ctc-mipal.tar.gz -C $FINALISE_DIR $cross_toolchain
 fi
 
 # Create crosstoolchain directory.
@@ -69,5 +74,5 @@ then
     ln -s atom/cross/$TRIPLE/sysroot $MIPAL_CROSSTOOLCHAIN/staging/atom-linux
     ln -s atom-linux $MIPAL_CROSSTOOLCHAIN/staging/$TRIPLE
     ln -s atom-linux $MIPAL_CROSSTOOLCHAIN/staging/$ARCH-$OS
-    tar -czf crosstoolchain.tar.gz -C $FINALISE $mipal_cross_toolchain
+    tar -czvf crosstoolchain.tar.gz -C $FINALISE_DIR $mipal_cross_toolchain
 fi
