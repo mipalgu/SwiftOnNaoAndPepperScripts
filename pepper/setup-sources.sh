@@ -39,7 +39,7 @@ fi
 if [ ! -d "apple/llvm" ]
 then
     cd apple
-    PYTHON=/usr/bin/python3 ./swift/utils/update-checkout --clone --tag $SWIFT_VERSION
+    /usr/bin/python3 swift/utils/update-checkout --clone --tag $SWIFT_VERSION
     cd $WD
 fi
 
