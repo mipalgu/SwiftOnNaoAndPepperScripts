@@ -72,6 +72,15 @@ then
     cd $WD
 fi
 
+if [ ! -d "apple/swift-corelibs-xctest" ]
+then
+    cd apple
+    git clone https://github.com/apple/swift-corelibs-xctest.git
+    cd swift-corelibs-xctest
+    git checkout $SWIFT_VERSION
+    cd $WD
+fi
+
 if [ ! -d "apple/swiftpm" ]
 then
     cd apple
