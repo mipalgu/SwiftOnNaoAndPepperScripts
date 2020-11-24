@@ -36,10 +36,48 @@ then
     cd $WD
 fi
 
-if [ ! -d "apple/llvm" ]
+if [ ! -d "apple/cmark" ]
 then
     cd apple
-    /usr/bin/python3 swift/utils/update-checkout --clone --tag $SWIFT_VERSION
+    git clone https://github.com/apple/swift-cmark.git cmark
+    cd cmark
+    git checkout $SWIFT_VERSION
+    cd $WD
+fi
+
+if [ ! -d "apple/llvm-project" ]
+then
+    cd apple
+    git clone https://github.com/apple/llvm-project.git llvm-project
+    cd llvm-project
+    git checkout $SWIFT_VERSION
+    cd $WD
+fi
+
+if [ ! -d "apple/swift-corelibs-foundation" ]
+then
+    cd apple
+    git clone https://github.com/apple/swift-corelibs-foundation.git
+    cd swift-corelibs-foundation
+    git checkout $SWIFT_VERSION
+    cd $WD
+fi
+
+if [ ! -d "apple/swift-corelibs-libdispatch" ]
+then
+    cd apple
+    git clone https://github.com/apple/swift-corelibs-libdispatch.git
+    cd swift-corelibs-libdispatch
+    git checkout $SWIFT_VERSION
+    cd $WD
+fi
+
+if [ ! -d "apple/swiftpm" ]
+then
+    cd apple
+    git clone https://github.com/apple/swift-package-manager.git swiftpm
+    cd swiftpm
+    git checkout $SWIFT_VERSION
     cd $WD
 fi
 
@@ -49,7 +87,7 @@ then
     git clone https://github.com/unicode-org/icu
     tag=`grep "\"icu\": \"" swift/utils/update_checkout/update-checkout-config.json | uniq | sed 's/.*"icu": "\(.*\)\([0-9]*\)-\([0-9]*\).*/\1\2-\3/'`
     cd icu
-    git checkout "$tag"
+    git checkout "$tag" || git checkout "release-65-1"
     cd $WD
 fi
 
