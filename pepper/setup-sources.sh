@@ -81,6 +81,23 @@ then
     cd $WD
 fi
 
+if [ ! -d "apple/tsc" ]
+then
+    cd apple
+    git clone https://github.com/apple/swift-tools-support-core.git tsc
+    cd tsc
+    cd $WD
+fi
+
+if [ ! -d "apple/llbuild" ]
+then
+    cd apple
+    git clone https://github.com/apple/swift-llbuild.git llbuild
+    cd llbuild
+    git checkout $SWIFT_VERSION
+    cd $WD
+fi
+
 if [ ! -d "apple/swiftpm" ]
 then
     cd apple
@@ -98,6 +115,13 @@ then
     cd icu
     git checkout "$tag" || git checkout "release-65-1"
     cd $WD
+fi
+
+if [ ! -d "ncurses" ]
+then
+	wget https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.1.tar.gz
+	tar -xzvf ncurses-6.1.tar.gz
+	mv ncurses-6.1 ncurses
 fi
 
 if [ -d apple/llvm-project ]
